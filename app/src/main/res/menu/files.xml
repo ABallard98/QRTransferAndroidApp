@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- Search / will display always -->
+    <item
+        android:id="@+id/action_search"
+        android:title="search"
+        app:showAsAction="always" />
+
+
+    <!-- More -->
+    <item
+        android:id="@+id/a_More"
+        android:title="More"
+        app:showAsAction="always">
+        <menu>
+
+            <!-- Refresh -->
+            <item
+                app:showAsAction="never"
+                android:id="@+id/action_refresh"
+                android:title="Refresh"/>
+
+            <!-- Help -->
+            <item
+            android:id="@+id/action_help"
+            android:title="Help"
+            app:showAsAction="never"
+            />
+
+            <!-- Check updates -->
+            <item
+                android:id="@+id/action_check_updates"
+                android:title="Refresh"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+</menu>
