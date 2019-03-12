@@ -54,12 +54,14 @@ public class FileListDisplay extends AppCompatActivity {
                 try{
 
                     String filename = fileNames.get(position);
-                    File fileToOpen = findFile(filename);
+                    File fileToOpen = FileManager.findFile(filename);
                     if(filename.contains(".pdf")){ //LAUNCH PDF
                        launchPdfFile(fileToOpen);
                     } else if (filename.contains(".png") || filename.contains(".jpg") ||
                             filename.contains(".jpeg")) {
 
+                        //launchFile(fileToOpen);
+                        //todo replace this intent with intent to launch in external app
                         Intent intent = new Intent(getBaseContext(), ImageViewActivity.class);
                         intent.putExtra("fileName", fileNames.get(position));
                         startActivity(intent);
@@ -77,8 +79,10 @@ public class FileListDisplay extends AppCompatActivity {
 
                 //delete file
                 try{
-                    File toDelete = findFile(fileNames.get(pos));
-                    toDelete.delete();
+                    File toDeleteInternal = FileManager.findFile(fileNames.get(pos));
+                    File toDeleteExternal = FileManager.findFileExternalStorage(fileNames.get(pos));
+                    toDeleteInternal.delete();
+                    toDeleteExternal.delete();
                 } catch(Exception e){
                     e.printStackTrace();
                 }
@@ -87,9 +91,11 @@ public class FileListDisplay extends AppCompatActivity {
                 fileNames.remove(pos);
                 fileSizes.remove(pos);
 
+                //re-initialize the array of downloaded files
                 initializeFileArrays();
                 fileListAdapter.notifyDataSetChanged();
 
+                //alert user file was deleted
                 Toast.makeText(getApplicationContext(),
                         "File Deleted ", Toast.LENGTH_LONG)
                         .show();
@@ -111,7 +117,7 @@ public class FileListDisplay extends AppCompatActivity {
                 Environment.DIRECTORY_DOWNLOADS) + "/" + pdfFile.getName());
         File dstFile = new File(dstPath);
 
-        System.out.println("SEARCHING FOR FILE:" + dstFile.getPath());
+        System.out.println("SEARCHING FOR FILE: " + dstFile.getPath());
 
         if (dstFile.exists()){
             Uri path = Uri.fromFile(dstFile);
@@ -128,25 +134,21 @@ public class FileListDisplay extends AppCompatActivity {
         File downloadedFilesFolder = new File(MainActivity.DB_PATH);
         File[] files = downloadedFilesFolder.listFiles();
         System.out.println("*** " + files.length + " ***");
-        for(File f : files){
-            if(f != null){
-                System.out.println("*** FILE FOUND - " + f.getAbsolutePath()+" ***");
-                fileNames.add(f.getName());
-                fileSizes.add(Long.toString(f.length()));
+        if(files != null){
+            System.out.println("*** " + files.length + " ***");
+            for(File f : files){
+                if(f != null){
+                    System.out.println("***\n FILE FOUND - " + f.getAbsolutePath()+"\nSIZE - " +
+                            f.length() + " BYTES \n***");
+                    fileNames.add(f.getName());
+
+                    fileSizes.add(f.length()+"");
+                }
             }
         }
     }
 
-    private File findFile(String filename){
-        File downloadedFilesFolder = new File(MainActivity.DB_PATH);
-        File[] listOfFiles = downloadedFilesFolder.listFiles();
-        for(File f : listOfFiles){
-            if(f.getName().equals(filename)){
-                return f;
-            }
-        }
-        return null;
-    }
+
 
 
 

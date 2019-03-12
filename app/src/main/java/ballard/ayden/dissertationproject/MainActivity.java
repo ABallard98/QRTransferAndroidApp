@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static String DB_PATH;
 
+
     private Button viewFilesButton;
     private Button downloadFileButton;
 
@@ -36,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         viewFilesButton = findViewById(R.id.viewFilesButton);
         downloadFileButton = findViewById(R.id.downloadFileButton);
-
-
 
     } //end of onCreate
 
@@ -51,32 +50,6 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(viewFilesIntent);
     }
 
-    public static File copyFileToExternalStorage(Context context, File fileToMove){
-        String dstPath = (Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS) + "/" + fileToMove.getName());
-        File dstFile = new File(dstPath);
-        try {
-            FileChannel inChannel = new FileInputStream(fileToMove).getChannel();
-            FileChannel outChannel = new FileOutputStream(dstFile).getChannel();
 
-            inChannel.transferTo(0, inChannel.size(), outChannel);
-            inChannel.close();
-            outChannel.close();
-        } catch (Exception  e) {
-            e.printStackTrace();
-        }
-        return dstFile;
-    }
-
-    public static File findFile(String filename){
-        File downloadedFilesFolder = new File(MainActivity.DB_PATH);
-        File[] listOfFiles = downloadedFilesFolder.listFiles();
-        for(File f : listOfFiles){
-            if(f.getName().equals(filename)){
-                return f;
-            }
-        }
-        return null;
-    }
 
 }//end of class

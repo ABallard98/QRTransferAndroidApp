@@ -42,7 +42,10 @@ public class ClientTransfer {
 
             filename = filename.replace(" ",""); //remove whitespaces in filename
 
+            //todo original file output stream
             FileOutputStream fos = context.openFileOutput(filename,Context.MODE_PRIVATE);
+
+            //FileOutputStream fos = new FileOutputStream(MainActivity.EXTERNAL_FILES_PATH);
             int fileSize = dis.readInt();
 
             byte[] buffer = new byte[4096];
@@ -52,17 +55,17 @@ public class ClientTransfer {
             while((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
                 totalRead += read;
                 remaining -= read;
-                System.out.println("read " + totalRead + " bytes.");
                 fos.write(buffer, 0, read);
             }
+            System.out.println("read " + totalRead + " bytes.");
 
             //close input and output streams
             fos.close();
             dis.close();
 
-            MainActivity.copyFileToExternalStorage(context, MainActivity.findFile(filename));
+            //move file to external storage for other apps
+            FileManager.copyFileToExternalStorage(context, FileManager.findFile(filename));
 
-            System.out.println("FILE SAVED - " + MainActivity.DB_PATH + filename);
         } catch (IOException e){
             e.printStackTrace();
         }

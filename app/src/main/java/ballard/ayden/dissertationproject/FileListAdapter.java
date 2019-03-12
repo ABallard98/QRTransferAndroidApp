@@ -31,7 +31,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.file_display, parent, false);
 
-        File fileToDisplay = findFile(fileNames.get(position));
+        File fileToDisplay = FileManager.findFile(fileNames.get(position));
 
         String fileSize = (Long.toString(fileToDisplay.length())+" Bytes");
 
@@ -44,7 +44,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
 
         imageView.setImageResource(R.drawable.ic_play_dark);
 
-        File file = findFile(fileNames.get(position));
+        File file = FileManager.findFile(fileNames.get(position));
 
         if(file != null){ //assign thumbnail
             if(fileNames.get(position).contains(".pdf")){
@@ -59,15 +59,6 @@ public class FileListAdapter extends ArrayAdapter<String> {
         return rowView;
     }
 
-    private File findFile(String filename){
-        File downloadedFilesFolder = new File(MainActivity.DB_PATH);
-        File[] listOfFiles = downloadedFilesFolder.listFiles();
-        for(File f : listOfFiles){
-            if(f.getName().equals(filename)){
-                return f;
-            }
-        }
-        return null;
-    }
+
 
 }

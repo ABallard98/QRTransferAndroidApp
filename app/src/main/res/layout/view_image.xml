@@ -24,8 +24,8 @@
 
         <ImageView
             android:id="@+id/downloadedImageView"
-            android:layout_width="393dp"
-            android:layout_height="456dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:srcCompat="@mipmap/ic_launcher"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="64dp" />

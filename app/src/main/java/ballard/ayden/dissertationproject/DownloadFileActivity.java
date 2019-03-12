@@ -74,21 +74,21 @@ public class DownloadFileActivity extends AppCompatActivity {
             if(!detector.isOperational()){
                 return;
             }
-
-            //detect barcode
-            Frame frame = new Frame.Builder().setBitmap(toScan).build();
-            SparseArray<Barcode> barcodeArray = detector.detect(frame);
-            Barcode thisCode = barcodeArray.valueAt(0);
-
-            String foundText = thisCode.rawValue;
-            foundStringTextView.setText(foundText);
-
-            String ipAddress=  FoundTextReader.readIPaddress(foundText);
-            int port = FoundTextReader.readPort(foundText);
-            String fileName = FoundTextReader.readFileName(foundText);
-            int filesize = FoundTextReader.readFileSizeBytes(foundText);
-
             try{
+                //detect barcode
+                Frame frame = new Frame.Builder().setBitmap(toScan).build();
+                SparseArray<Barcode> barcodeArray = detector.detect(frame);
+                Barcode thisCode = barcodeArray.valueAt(0);
+
+                String foundText = thisCode.rawValue;
+                foundStringTextView.setText(foundText);
+
+                String ipAddress=  FoundTextReader.readIPaddress(foundText);
+                int port = FoundTextReader.readPort(foundText);
+                String fileName = FoundTextReader.readFileName(foundText);
+                int filesize = FoundTextReader.readFileSizeBytes(foundText);
+
+
                 ClientTransfer clientTransfer = new ClientTransfer(ipAddress,port,fileName,filesize);
                 clientTransfer.run(this);
 
