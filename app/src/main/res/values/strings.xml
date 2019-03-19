@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">QR File Transfer</string>
+    <string name="qr_file_transfer">QR File Transfer</string>
+    <string name="download_a_file">Download a file</string>
+    <string name="view_files">View files</string>
+    <string name="select_file">Select File</string>
 </resources>

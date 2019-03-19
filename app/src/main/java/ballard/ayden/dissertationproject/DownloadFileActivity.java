@@ -89,8 +89,8 @@ public class DownloadFileActivity extends AppCompatActivity {
                 int filesize = FoundTextReader.readFileSizeBytes(foundText);
 
 
-                ClientTransfer clientTransfer = new ClientTransfer(ipAddress,port,fileName,filesize);
-                clientTransfer.run(this);
+                ClientTransferDownload clientTransferDownload = new ClientTransferDownload(ipAddress,port,fileName,filesize);
+                clientTransferDownload.run(this);
 
                 //load image
                 cameraPicTaken.setImageBitmap(BitmapFactory.decodeFile(DB_PATH+"/"+fileName));
