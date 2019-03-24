@@ -18,11 +18,16 @@
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="match_parent"
-            android:layout_height="181dp"
+            android:layout_height="66dp"
             android:text="@string/qr_file_transfer"
             android:textAlignment="center"
             android:textSize="30sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="match_parent"
+            android:layout_height="231dp" />
 
         <Button
             android:id="@+id/downloadFileButton"
@@ -44,5 +49,6 @@
             android:layout_height="wrap_content"
             android:text="@string/view_files"
             android:onClick="launchViewFilesActivity" />
+
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

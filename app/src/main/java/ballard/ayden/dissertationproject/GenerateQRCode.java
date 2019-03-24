@@ -2,25 +2,15 @@ package ballard.ayden.dissertationproject;
 
 
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.widget.ImageView;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.qrcode.encoder.QRCode;
-
-
 
 public class GenerateQRCode {
 
+    /**
+     * Method to generate the text to be contained in the QR Code
+     * @param file - File to be transferred
+     * @return String - text to be contained in QR code
+     */
     public synchronized static String generateQRCodeText(File file) {
         String filename = file.getName().replace("-","");
         long fileSizeBytes = file.length();
@@ -29,11 +19,14 @@ public class GenerateQRCode {
         return qrCodeText;
     }
 
+    /**
+     * Method to generate the QR Code image as a Bitmap
+     * @param file - File to be transferred
+     * @return Bitmap - QR code
+     */
     public synchronized static Bitmap generateQRCodeImage(File file){
         String qrText = generateQRCodeText(file);
-
         Bitmap bitmap = net.glxn.qrgen.android.QRCode.from(qrText).bitmap();
-
         return bitmap;
     }
 }

@@ -8,12 +8,9 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
@@ -22,30 +19,19 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 public class DownloadFileActivity extends AppCompatActivity {
 
-    private ImageView cameraPicTaken;
-    private TextView foundStringTextView;
-    private Button takePicButton;
-    private Button downloadButton;
+    private ImageView cameraPicTaken; //image view for pic taken by user
+    private Button takePicButton; //button to prompt user to take a picture using camera
+    private Button downloadButton; //transfer button to upload file to server
     private static final int REQUEST_IMAGE_CAPTURE = 1337;
-
-    public static String DB_PATH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.download_files);
 
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-//        setSupportActionBar(myToolbar);
-
-        //getActionBar().setTitle("QR FileTransfer");
-        //initialise elements
-        //DB_PATH =  getFilesDir().getAbsolutePath();
         takePicButton = findViewById(R.id.cameraButton);
         downloadButton = findViewById(R.id.downloadButton);
         cameraPicTaken = findViewById(R.id.qrCode);
-        foundStringTextView = findViewById(R.id.foundStringTextView);
-
 
         downloadButton.setVisibility(View.INVISIBLE);
 
@@ -81,30 +67,36 @@ public class DownloadFileActivity extends AppCompatActivity {
                 Barcode thisCode = barcodeArray.valueAt(0);
 
                 String foundText = thisCode.rawValue;
-                foundStringTextView.setText(foundText);
 
+                //grab ipAddress, port, filename and file-size from found String
                 String ipAddress=  FoundTextReader.readIPaddress(foundText);
                 int port = FoundTextReader.readPort(foundText);
                 String fileName = FoundTextReader.readFileName(foundText);
-                int filesize = FoundTextReader.readFileSizeBytes(foundText);
+                int fileSize = FoundTextReader.readFileSizeBytes(foundText);
 
+                //create FileTransferDownload thread
+                FileTransferDownload fileTransferDownload =
+                        new FileTransferDownload(ipAddress,port,fileName,fileSize);
+                fileTransferDownload.run(this);
 
-                ClientTransferDownload clientTransferDownload = new ClientTransferDownload(ipAddress,port,fileName,filesize);
-                clientTransferDownload.run(this);
+                //load image into imageView
+                cameraPicTaken.setImageBitmap(BitmapFactory.decodeFile(
+                        MainActivity.DB_PATH+"/"+fileName));
 
-                //load image
-                cameraPicTaken.setImageBitmap(BitmapFactory.decodeFile(DB_PATH+"/"+fileName));
+                //alert user file was successfully downloaded
                 Toast.makeText(this, "FILE DOWNLOADED", Toast.LENGTH_LONG).show();
+
+                //return user to MainActivity
+                Intent mainActivityIntent = new Intent(this, MainActivity.class);
+                this.startActivity(mainActivityIntent);
 
             } catch (Exception e){
                 e.printStackTrace();
+                //alert user file could not be transferred
+                Toast.makeText(this, "Error - File could not be downloaded",
+                        Toast.LENGTH_LONG).show();
             }
         }
-
-        /*
-        Intent i = new Intent(Intent.ACTION_VIEW,Uri.parse("https://"+foundText));
-        startActivity(i);
-        */
     }
 
     /**
@@ -121,6 +113,12 @@ public class DownloadFileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to take the image taken by the user and decode the QR code in image if it exists
+     * @param requestCode - int
+     * @param resultCode - int
+     * @param data - Intent
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -130,6 +128,9 @@ public class DownloadFileActivity extends AppCompatActivity {
             try {
                 ImageView qrImageView = findViewById(R.id.qrCode);
                 qrImageView.setImageBitmap(thumbnail);
+
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -139,12 +140,4 @@ public class DownloadFileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.files, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
 }

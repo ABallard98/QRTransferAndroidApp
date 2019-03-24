@@ -50,11 +50,6 @@
             android:onClick="downloadButtonOnClick"
             android:text="Download" />
 
-        <TextView
-            android:id="@+id/foundStringTextView"
-            android:layout_width="match_parent"
-            android:layout_height="122dp" />
-
 
     </LinearLayout>
 

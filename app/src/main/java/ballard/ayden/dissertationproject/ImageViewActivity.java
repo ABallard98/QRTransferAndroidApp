@@ -11,10 +11,14 @@ import java.io.File;
 public class ImageViewActivity extends AppCompatActivity {
 
 
-    private ImageView downloadedImageView;
-    private TextView imageNameTextView;
-    private File fileToDisplay;
+    private ImageView downloadedImageView; //ImageView for downloaded image
+    private TextView imageNameTextView; //TextView for name of file
+    private File fileToDisplay; //File to display
 
+    /**
+     * Initializer for ImageViewActivity
+     * @param savedInstanceState - Bundle
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,23 +27,14 @@ public class ImageViewActivity extends AppCompatActivity {
         downloadedImageView = findViewById(R.id.downloadedImageView);
         imageNameTextView = findViewById(R.id.imageNameTextView);
 
-        imageNameTextView.setText("????");
+        //find file to display
+        fileToDisplay = FileManager.findFile(getIntent().getStringExtra("fileName"));
 
-        fileToDisplay = findFile(getIntent().getStringExtra("fileName"));
-
+        //load file name into text view
         imageNameTextView.setText(fileToDisplay.getName());
-        downloadedImageView.setImageBitmap(BitmapFactory.decodeFile(fileToDisplay.getPath()));
-    }
 
-    private File findFile(String filename){
-        File downloadedFilesFolder = new File(MainActivity.DB_PATH);
-        File[] listOfFiles = downloadedFilesFolder.listFiles();
-        for(File f : listOfFiles){
-            if(f.getName().equals(filename)){
-                return f;
-            }
-        }
-        return null;
+        //load image into image view
+        downloadedImageView.setImageBitmap(BitmapFactory.decodeFile(fileToDisplay.getPath()));
     }
 
 }

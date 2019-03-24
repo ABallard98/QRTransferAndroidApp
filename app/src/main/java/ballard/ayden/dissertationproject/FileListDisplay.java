@@ -1,32 +1,30 @@
 package ballard.ayden.dissertationproject;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class FileListDisplay extends AppCompatActivity {
 
 
-    private File downloadedFilesFolder;
-    private File[] listOfFiles;
-    private ArrayList<String> fileNames;
-    private ArrayList<String> fileSizes;
+    private File downloadedFilesFolder; //Parent file of all downloaded files
+    private File[] listOfFiles; //list of the downloaded files
+    private ArrayList<String> fileNames; //ArrayList of the file names
+    private ArrayList<String> fileSizes; //ArrayList of the file sizes (in bytes)
 
+    /**
+     * Method to initializer FileListDisplay
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -47,21 +45,26 @@ public class FileListDisplay extends AppCompatActivity {
 
         listView.setAdapter(fileListAdapter);
 
+        //on click listener for downloaded files
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 try{
-
                     String filename = fileNames.get(position);
                     File fileToOpen = FileManager.findFile(filename);
-                    if(filename.contains(".pdf")){ //LAUNCH PDF
+                    if(filename.contains(".pdf")){ //If the file is a PDF
                        launchPdfFile(fileToOpen);
-                    } else if (filename.contains(".png") || filename.contains(".jpg") ||
-                            filename.contains(".jpeg")) {
+                    }
+                    else if (filename.contains(".mp4")){
+                        launchVideoFile(fileToOpen);
+                    }
+                    //image MIME types
+                    else if (filename.contains(".png") || filename.contains(".jpg") ||
+                            filename.contains(".jpeg")){ //If the file is an image
 
-                        //launchFile(fileToOpen);
                         //todo replace this intent with intent to launch in external app
+
                         Intent intent = new Intent(getBaseContext(), ImageViewActivity.class);
                         intent.putExtra("fileName", fileNames.get(position));
                         startActivity(intent);
@@ -72,17 +75,15 @@ public class FileListDisplay extends AppCompatActivity {
             }
         });
 
+        //on long click listener to delete a downloaded file
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
                                            int pos, long id) {
 
-                //delete file
                 try{
-                    File toDeleteInternal = FileManager.findFile(fileNames.get(pos));
-                    File toDeleteExternal = FileManager.findFileExternalStorage(fileNames.get(pos));
-                    toDeleteInternal.delete();
-                    toDeleteExternal.delete();
+                    //delete file from internal/external storage
+                    FileManager.deleteFileInternalExternal(fileNames.get(pos));
                 } catch(Exception e){
                     e.printStackTrace();
                 }
@@ -92,32 +93,28 @@ public class FileListDisplay extends AppCompatActivity {
                 fileSizes.remove(pos);
 
                 //re-initialize the array of downloaded files
-                initializeFileArrays();
                 fileListAdapter.notifyDataSetChanged();
 
                 //alert user file was deleted
                 Toast.makeText(getApplicationContext(),
                         "File Deleted ", Toast.LENGTH_LONG)
                         .show();
+
                 return true;
             }
         });
 
     }
 
-    private void launchFile(File fileToLaunch){
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse("file://" + fileToLaunch.getPath()), "image/*");
-        startActivity(intent);
-    }
-
+    /**
+     * Method to launch a pdf file
+     * @param pdfFile - pdfFile to be opened
+     */
     private void launchPdfFile(File pdfFile){
         String dstPath = (Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS) + "/" + pdfFile.getName());
-        File dstFile = new File(dstPath);
 
-        System.out.println("SEARCHING FOR FILE: " + dstFile.getPath());
+        File dstFile = new File(dstPath);
 
         if (dstFile.exists()){
             Uri path = Uri.fromFile(dstFile);
@@ -130,6 +127,28 @@ public class FileListDisplay extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to launch a video MIME type file
+     * @param videoFile - video file to be opened
+     */
+    private void launchVideoFile(File videoFile){
+        String dstPath = (Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS) + "/" + videoFile.getName());
+        File dstFile = new File(dstPath);
+        if (dstFile.exists()){
+            Uri path = Uri.fromFile(dstFile);
+            Intent objIntent = new Intent(Intent.ACTION_VIEW);
+            objIntent.setDataAndType(path, "video/*");
+            objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(objIntent);//Starting the video viewer
+        } else {
+            Toast.makeText(this, "The file not exists! ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Method to initialize file arrays which contain the file names and sizes
+     */
     private void initializeFileArrays(){
         File downloadedFilesFolder = new File(MainActivity.DB_PATH);
         File[] files = downloadedFilesFolder.listFiles();
@@ -147,9 +166,4 @@ public class FileListDisplay extends AppCompatActivity {
             }
         }
     }
-
-
-
-
-
 }
