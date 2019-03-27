@@ -4,6 +4,10 @@ package ballard.ayden.dissertationproject;
 import android.graphics.Bitmap;
 import java.io.File;
 
+/**
+ * This class is used to generate the QR codes needed for uploaded files.
+ * @author Ayden Ballard
+ */
 public class GenerateQRCode {
 
     /**

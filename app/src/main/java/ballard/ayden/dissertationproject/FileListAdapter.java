@@ -13,6 +13,12 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.*;
 
+/**
+ * This class extends ArrayAdapater to provide a custom Adapter for the FilelistDisplay class. It
+ * takes all previously downloaded files and allocates its name, size and a thumbnail to its row.
+ * @author Ayden Ballard
+ */
+
 public class FileListAdapter extends ArrayAdapter<String> {
 
     private ArrayList<String> fileNames; //ArrayList of file names

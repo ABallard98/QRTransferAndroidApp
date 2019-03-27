@@ -13,6 +13,14 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * This class acts as the controller for the FileListDisplay activity. This class provides a list
+ * view of all files transferred using the application. FileListAdapater is used to implement the
+ * list view. Files can be deleted from the system by doing a long click on the file to be deleted.
+ * Files can also be opened and are launched using an internal intent.
+ * @author Ayden Ballard
+ */
+
 public class FileListDisplay extends AppCompatActivity {
 
 
@@ -56,18 +64,13 @@ public class FileListDisplay extends AppCompatActivity {
                     if(filename.contains(".pdf")){ //If the file is a PDF
                        launchPdfFile(fileToOpen);
                     }
-                    else if (filename.contains(".mp4")){
-                        launchVideoFile(fileToOpen);
-                    }
                     //image MIME types
                     else if (filename.contains(".png") || filename.contains(".jpg") ||
                             filename.contains(".jpeg")){ //If the file is an image
-
-                        //todo replace this intent with intent to launch in external app
-
-                        Intent intent = new Intent(getBaseContext(), ImageViewActivity.class);
-                        intent.putExtra("fileName", fileNames.get(position));
-                        startActivity(intent);
+                        launchImageFile(fileToOpen);
+                    }
+                    else if (filename.contains(".mp4")){
+                        launchVideoFile(fileToOpen);
                     }
                 } catch (Exception e){
                     e.printStackTrace();
@@ -139,6 +142,21 @@ public class FileListDisplay extends AppCompatActivity {
             Uri path = Uri.fromFile(dstFile);
             Intent objIntent = new Intent(Intent.ACTION_VIEW);
             objIntent.setDataAndType(path, "video/*");
+            objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(objIntent);//Starting the video viewer
+        } else {
+            Toast.makeText(this, "The file not exists! ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchImageFile(File imageFile){
+        String dstPath = (Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS) + "/" + imageFile.getName());
+        File dstFile = new File(dstPath);
+        if (dstFile.exists()){
+            Uri path = Uri.fromFile(dstFile);
+            Intent objIntent = new Intent(Intent.ACTION_VIEW);
+            objIntent.setDataAndType(path, "image/*");
             objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(objIntent);//Starting the video viewer
         } else {

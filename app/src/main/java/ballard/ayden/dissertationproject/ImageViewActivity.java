@@ -8,8 +8,11 @@ import android.widget.TextView;
 
 import java.io.File;
 
+/**
+ * This class is used to allow the user to open and inspect images transferred using the application.
+ * @author Ayden Ballard
+ */
 public class ImageViewActivity extends AppCompatActivity {
-
 
     private ImageView downloadedImageView; //ImageView for downloaded image
     private TextView imageNameTextView; //TextView for name of file

@@ -1,18 +1,17 @@
 package ballard.ayden.dissertationproject;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.StrictMode;
-import android.provider.MediaStore;
-
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.Socket;
-import java.util.Date;
 
+/**
+ * This class is used to implement the file upload process.
+ * @author Ayden Ballard
+ */
 public class FileTransferUpload implements Runnable {
 
     private File fileToTransfer; //File to transfer

@@ -8,6 +8,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 
+/**
+ * This class is used to manage the files downloaded using the application.
+ * @author Ayden Ballard
+ */
+
 public class FileManager {
 
     public static final String EXTERNAL_FILES_PATH = Environment.getExternalStoragePublicDirectory(

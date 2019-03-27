@@ -16,6 +16,13 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+
+/**
+ * This class acts as the controller for the GenerateQrActivity. This class is used when the user
+ * wishes to upload a file from their mobile phone to the server. When the user selects a file, it
+ * is uploaded to the server, and a QR code that links the file is generated.
+ * @author Ayden Ballard
+ */
 public class GenerateQrActivity extends AppCompatActivity {
 
     private ImageView qrImageView; //ImageView for generated QR code

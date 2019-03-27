@@ -1,17 +1,20 @@
 package ballard.ayden.dissertationproject;
 
 import android.content.Context;
-import android.os.Environment;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-
+/**
+ * This class is used to implement the file download process. The FileTransferDownload class takes in an
+ * IP address, a port number, the file name and the files size in bytes. When the run() method is
+ * called, the application connects to the server using a socket. The files information is then
+ * sent and reconstructed on this device.
+ * @author Ayden Ballard
+ */
 public class FileTransferDownload {
 
     private String address; //IP Address of server
@@ -79,6 +82,5 @@ public class FileTransferDownload {
             e.printStackTrace();
         }
     }
-
 
 }

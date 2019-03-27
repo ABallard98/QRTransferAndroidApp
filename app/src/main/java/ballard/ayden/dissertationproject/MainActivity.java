@@ -7,6 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+/**
+ * This class acts as the controller for the MainActivity. This activity is opened at launch and
+ * allows the user to either scan a QR code, generate a QR code for a file, or see previously
+ * transferred files.
+ * @author Ayden Ballard
+ */
 public class MainActivity extends AppCompatActivity {
 
     public static String DB_PATH; //path for internal files

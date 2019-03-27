@@ -17,6 +17,13 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
+/**
+ * This class acts as the controller for the DownloadFileActivity. In this activity, the user is
+ * able to take an image of a QR code using their camera. The information is then extracted from
+ * the QR code, and the file liked to that QR code is then downloaded on to the users device.
+ * @author Ayden Ballard
+ */
+
 public class DownloadFileActivity extends AppCompatActivity {
 
     private ImageView cameraPicTaken; //image view for pic taken by user
@@ -47,8 +54,10 @@ public class DownloadFileActivity extends AppCompatActivity {
      */
     public void downloadButtonOnClick(View v){
         if(cameraPicTaken.getDrawable() == null){
-
+            //if no picture has been taken yet
+            return;
         } else{
+            //Bitmap image to scan
             BitmapDrawable drawable = (BitmapDrawable) cameraPicTaken.getDrawable();
             Bitmap toScan = drawable.getBitmap();
 
@@ -69,7 +78,7 @@ public class DownloadFileActivity extends AppCompatActivity {
                 String foundText = thisCode.rawValue;
 
                 //grab ipAddress, port, filename and file-size from found String
-                String ipAddress=  FoundTextReader.readIPaddress(foundText);
+                String ipAddress=  FoundTextReader.readIpAddress(foundText);
                 int port = FoundTextReader.readPort(foundText);
                 String fileName = FoundTextReader.readFileName(foundText);
                 int fileSize = FoundTextReader.readFileSizeBytes(foundText);
@@ -100,6 +109,43 @@ public class DownloadFileActivity extends AppCompatActivity {
     }
 
     /**
+     * Method to scan the QR Code and set the text of the download to the name of file stored
+     * in the QR code.
+     */
+    private void setDownloadButton(){
+
+        //Bitmap image to scan
+        BitmapDrawable drawable = (BitmapDrawable) cameraPicTaken.getDrawable();
+        Bitmap toScan = drawable.getBitmap();
+
+        //initialise barcode detector
+        BarcodeDetector detector =
+                new BarcodeDetector.Builder(getApplicationContext())
+                        .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
+                        .build();
+
+        if(!detector.isOperational()){
+            return;
+        }
+        try {
+            //detect barcode
+            Frame frame = new Frame.Builder().setBitmap(toScan).build();
+            SparseArray<Barcode> barcodeArray = detector.detect(frame);
+            Barcode thisCode = barcodeArray.valueAt(0);
+
+            //found text from the QR code
+            String foundText = thisCode.rawValue;
+
+            //grab ipAddress  found String
+            String fileName = FoundTextReader.readFileName(foundText);
+
+            //set download button text
+            downloadButton.setText("Download " + fileName);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+   }
+    /**
      * Method to start an implicit intent to activate the camera to allow the user
      * to take a picture of a barcode
      * @param v
@@ -128,8 +174,7 @@ public class DownloadFileActivity extends AppCompatActivity {
             try {
                 ImageView qrImageView = findViewById(R.id.qrCode);
                 qrImageView.setImageBitmap(thumbnail);
-
-
+                setDownloadButton();
 
             } catch (Exception e) {
                 e.printStackTrace();
