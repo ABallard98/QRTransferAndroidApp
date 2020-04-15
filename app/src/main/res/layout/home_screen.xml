@@ -3,52 +3,55 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_theme">
+    s
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="match_parent"
-            android:layout_height="66dp"
-            android:text="@string/qr_file_transfer"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
         <ImageView
             android:id="@+id/logoImageView"
             android:layout_width="match_parent"
-            android:layout_height="231dp" />
+            android:layout_height="337dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="350dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Button
             android:id="@+id/downloadFileButton"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/download_a_file"
-            android:onClick="launchDownloadFileActivity"/>
+            android:onClick="launchDownloadFileActivity"
+            android:text="@string/download_a_file" />
 
         <Button
             android:id="@+id/selectFileButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/select_file"
-            android:onClick="launchGenerateQrActivity"/>
+            android:onClick="launchGenerateQrActivity"
+            android:text="@string/select_file" />
 
         <Button
             android:id="@+id/viewFilesButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/view_files"
-            android:onClick="launchViewFilesActivity" />
-
+            android:onClick="launchViewFilesActivity"
+            android:text="@string/view_files" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -15,7 +15,7 @@ import java.net.Socket;
 public class FileTransferUpload implements Runnable {
 
     private File fileToTransfer; //File to transfer
-    private final String IP_ADDRESS = "80.2.250.205"; //IP Address of Server
+    private final String IP_ADDRESS = "109.148.220.112"; //IP Address of Server
     private final int PORT = 8007; //Port to connect to
 
     /**

@@ -58,7 +58,6 @@ public class FoundTextReader {
      * @return int - bytes
      */
     public static int readFileSizeBytes(String foundText){
-        System.out.println(foundText);
         Scanner in = new Scanner(foundText);
         in.useDelimiter("-");
         in.next();//skip ip address
@@ -70,7 +69,24 @@ public class FoundTextReader {
         return Integer.valueOf(fileSizeBytes);
     }
 
+    /**
+     * Method to return the file size in mb as a string
+     * @param foundText - embedded QR code
+     * @return size file in mb as a String
+     */
+    public static String readFileSizeString(String foundText){
+        int fileSizeBytes = readFileSizeBytes(foundText);
 
+        if(fileSizeBytes > 1000000){
+            long fileSizeMb = Math.round(fileSizeBytes / Math.pow(1024,2));
+            String toReturn = fileSizeMb + "mb";
+            return toReturn;
+        } else {
+            String toReturn = fileSizeBytes + " bytes";
+            return toReturn;
+        }
+
+    }
 
 
 }

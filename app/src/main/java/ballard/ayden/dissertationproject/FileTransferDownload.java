@@ -43,7 +43,7 @@ public class FileTransferDownload {
     public void run(Context context) {
         try {
             System.out.println("connecting...");
-            Socket sock = new Socket(address, port);
+            Socket sock = new Socket("109.148.220.112", port);
             System.out.println("connected");
 
             //sending instructions to the server
@@ -55,7 +55,7 @@ public class FileTransferDownload {
             DataInputStream dis = new DataInputStream(sock.getInputStream());
 
             filename = filename.replace(" ",""); //remove whitespaces in filename
-
+            filename = filename.toLowerCase();
             FileOutputStream fos = context.openFileOutput(filename,Context.MODE_PRIVATE);
 
             //copy file to internal storage of application

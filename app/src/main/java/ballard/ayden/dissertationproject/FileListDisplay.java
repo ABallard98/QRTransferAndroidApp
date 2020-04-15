@@ -1,11 +1,14 @@
 package ballard.ayden.dissertationproject;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -23,9 +26,8 @@ import java.util.ArrayList;
 
 public class FileListDisplay extends AppCompatActivity {
 
-
-    private File downloadedFilesFolder; //Parent file of all downloaded files
-    private File[] listOfFiles; //list of the downloaded files
+//    private File downloadedFilesFolder; //Parent file of all downloaded files
+//    private File[] listOfFiles; //list of the downloaded files
     private ArrayList<String> fileNames; //ArrayList of the file names
     private ArrayList<String> fileSizes; //ArrayList of the file sizes (in bytes)
 
@@ -41,19 +43,21 @@ public class FileListDisplay extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
+        //ArrayLists for file names and sizes
         fileNames = new ArrayList();
         fileSizes = new ArrayList();
-
         initializeFileArrays();
 
+        //action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Initializing FileListAdapter
         final FileListAdapter fileListAdapter = new FileListAdapter(this,
                 R.layout.file_display,fileNames);
-
         final ListView listView = findViewById(R.id.fileListView);
-
         listView.setAdapter(fileListAdapter);
 
-        //on click listener for downloaded files
+        //on click listener to open downloaded files
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -66,7 +70,7 @@ public class FileListDisplay extends AppCompatActivity {
                     }
                     //image MIME types
                     else if (filename.contains(".png") || filename.contains(".jpg") ||
-                            filename.contains(".jpeg")){ //If the file is an image
+                            filename.contains(".jpeg")) { //If the file is an image
                         launchImageFile(fileToOpen);
                     }
                     else if (filename.contains(".mp4")){
@@ -83,30 +87,45 @@ public class FileListDisplay extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
                                            int pos, long id) {
-
                 try{
-                    //delete file from internal/external storage
-                    FileManager.deleteFileInternalExternal(fileNames.get(pos));
+                    final int filePos = pos; //must be final for internal method
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch(which){
+                                case(DialogInterface.BUTTON_POSITIVE):
+
+                                    //Delete file from internal and external storage
+                                    FileManager.deleteFileInternalExternal(fileNames.get(filePos));
+                                    //remove from names and size array lists
+                                    fileNames.remove(filePos);
+                                    fileSizes.remove(filePos);
+
+                                    //re-initialize the array of downloaded files
+                                    fileListAdapter.notifyDataSetChanged();
+
+                                    //alert user file was deleted
+                                    Toast.makeText(getApplicationContext(),
+                                            "File Deleted ", Toast.LENGTH_LONG)
+                                            .show();
+                                    break;
+                                case(DialogInterface.BUTTON_NEGATIVE):
+                                    break;
+                            }
+                        }
+                    };
+                    //Building dialog popup for file deletion confirmation
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FileListDisplay.this);
+                    builder.setTitle(R.string.delete_dialog_title);
+                    builder.setPositiveButton("Yes", dialogClickListener);
+                    builder.setNegativeButton("No", dialogClickListener);
+                    builder.show();
                 } catch(Exception e){
                     e.printStackTrace();
                 }
-
-                //remove from names and size array lists
-                fileNames.remove(pos);
-                fileSizes.remove(pos);
-
-                //re-initialize the array of downloaded files
-                fileListAdapter.notifyDataSetChanged();
-
-                //alert user file was deleted
-                Toast.makeText(getApplicationContext(),
-                        "File Deleted ", Toast.LENGTH_LONG)
-                        .show();
-
                 return true;
             }
         });
-
     }
 
     /**
@@ -116,17 +135,16 @@ public class FileListDisplay extends AppCompatActivity {
     private void launchPdfFile(File pdfFile){
         String dstPath = (Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS) + "/" + pdfFile.getName());
-
         File dstFile = new File(dstPath);
-
-        if (dstFile.exists()){
-            Uri path = Uri.fromFile(dstFile);
-            Intent objIntent = new Intent(Intent.ACTION_VIEW);
+        if (dstFile.exists()){ //if file exists
+            Uri path = Uri.fromFile(dstFile); //path of file
+            Intent objIntent = new Intent(Intent.ACTION_VIEW); //intent to launch pdf file
             objIntent.setDataAndType(path, "application/pdf");
             objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(objIntent);//Starting the pdf viewer
         } else {
-            Toast.makeText(this, "The file not exists! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: This file does not exists.",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -145,22 +163,32 @@ public class FileListDisplay extends AppCompatActivity {
             objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(objIntent);//Starting the video viewer
         } else {
-            Toast.makeText(this, "The file not exists! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: This file does not exists! ",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Method to launch an image MIME type file
+     * @param imageFile - image file to be launched
+     */
     private void launchImageFile(File imageFile){
         String dstPath = (Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS) + "/" + imageFile.getName());
         File dstFile = new File(dstPath);
         if (dstFile.exists()){
-            Uri path = Uri.fromFile(dstFile);
-            Intent objIntent = new Intent(Intent.ACTION_VIEW);
-            objIntent.setDataAndType(path, "image/*");
-            objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(objIntent);//Starting the video viewer
+            try{
+                Uri path = Uri.fromFile(dstFile);
+                Intent objIntent = new Intent(Intent.ACTION_VIEW);
+                objIntent.setDataAndType(path, "image/*");
+                objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(objIntent);//Starting the video viewer
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         } else {
-            Toast.makeText(this, "The file not exists! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: This file does not exists! ",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -184,4 +212,16 @@ public class FileListDisplay extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Activity to take user back to homepage
+     * @param item
+     * @return
+     */
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(myIntent, 0);
+        return true;
+    }
+
 }

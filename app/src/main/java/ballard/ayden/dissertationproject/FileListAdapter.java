@@ -51,8 +51,6 @@ public class FileListAdapter extends ArrayAdapter<String> {
 
         File fileToDisplay = FileManager.findFile(fileNames.get(position));
 
-
-
         TextView firstLine = rowView.findViewById(R.id.firstLine);
         TextView secondLine = rowView.findViewById(R.id.secondLine);
         ImageView imageView = rowView.findViewById(R.id.icon);

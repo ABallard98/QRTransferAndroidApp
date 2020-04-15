@@ -1,5 +1,6 @@
 package ballard.ayden.dissertationproject;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,6 +29,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 public class DownloadFileActivity extends AppCompatActivity {
 
     private ImageView cameraPicTaken; //image view for pic taken by user
+    private ImageView fileTypeImageView; //image view for the file type
     private Button takePicButton; //button to prompt user to take a picture using camera
     private Button downloadButton; //transfer button to upload file to server
     private static final int REQUEST_IMAGE_CAPTURE = 1337;
@@ -39,8 +42,15 @@ public class DownloadFileActivity extends AppCompatActivity {
         takePicButton = findViewById(R.id.cameraButton);
         downloadButton = findViewById(R.id.downloadButton);
         cameraPicTaken = findViewById(R.id.qrCode);
+        fileTypeImageView = findViewById(R.id.fileTypeImageView);
 
+        //action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        //download button and file type image to be invisible till QR code scanned
         downloadButton.setVisibility(View.INVISIBLE);
+        fileTypeImageView.setVisibility(View.INVISIBLE);
 
         //needed to save file
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -127,6 +137,7 @@ public class DownloadFileActivity extends AppCompatActivity {
         if(!detector.isOperational()){
             return;
         }
+
         try {
             //detect barcode
             Frame frame = new Frame.Builder().setBitmap(toScan).build();
@@ -139,8 +150,22 @@ public class DownloadFileActivity extends AppCompatActivity {
             //grab ipAddress  found String
             String fileName = FoundTextReader.readFileName(foundText);
 
+            String fileSize = FoundTextReader.readFileSizeString(foundText);
+
+            //set file type image view
+            if(fileName.contains(".pdf")){
+                this.fileTypeImageView.setImageResource(R.drawable.ic_pdf);
+            } else if(fileName.contains(".png") || fileName.contains(".jpg")){
+                this.fileTypeImageView.setImageResource(R.drawable.image_icon);
+            }
+
             //set download button text
-            downloadButton.setText("Download " + fileName);
+            downloadButton.setText("Download " + fileName + "\n(" + fileSize + ")");
+
+            //set file type image view and download button visibility to true
+            this.fileTypeImageView.setVisibility(View.VISIBLE);
+            downloadButton.setVisibility(View.VISIBLE);
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -155,9 +180,21 @@ public class DownloadFileActivity extends AppCompatActivity {
         // request code
         startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
         if (cameraPicTaken.getDrawable() == null){
-            downloadButton.setVisibility(View.VISIBLE);
+            //downloadButton.setVisibility(View.VISIBLE);
         }
     }
+
+    /**
+     * Activity to take user back to homepage
+     * @param item
+     * @return
+     */
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(myIntent, 0);
+        return true;
+    }
+
 
     /**
      * Method to take the image taken by the user and decode the QR code in image if it exists
