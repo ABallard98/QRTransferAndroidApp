@@ -8,12 +8,15 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -26,10 +29,21 @@ import java.util.ArrayList;
 
 public class FileListDisplay extends AppCompatActivity {
 
-//    private File downloadedFilesFolder; //Parent file of all downloaded files
-//    private File[] listOfFiles; //list of the downloaded files
     private ArrayList<String> fileNames; //ArrayList of the file names
     private ArrayList<String> fileSizes; //ArrayList of the file sizes (in bytes)
+    private ArrayList<File> files;
+    private FileListAdapter fileListAdapter;
+    private ListView listView;
+
+    private Menu sortMenu;
+
+    private enum SortOrder {
+        ALPHABETICAL,
+        DATE,
+        FILETYPE
+    }
+
+    private SortOrder sortOrder;
 
     /**
      * Method to initializer FileListDisplay
@@ -46,16 +60,21 @@ public class FileListDisplay extends AppCompatActivity {
         //ArrayLists for file names and sizes
         fileNames = new ArrayList();
         fileSizes = new ArrayList();
+        files = new ArrayList<>();
         initializeFileArrays();
+
+        //Sort order alphabetical by default
+        this.sortOrder = SortOrder.ALPHABETICAL;
+
 
         //action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Initializing FileListAdapter
-        final FileListAdapter fileListAdapter = new FileListAdapter(this,
-                R.layout.file_display,fileNames);
-        final ListView listView = findViewById(R.id.fileListView);
-        listView.setAdapter(fileListAdapter);
+                 this.fileListAdapter = new FileListAdapter(this,
+                R.layout.file_display,fileNames, files);
+         this.listView = findViewById(R.id.fileListView);
+         listView.setAdapter(fileListAdapter);
 
         //on click listener to open downloaded files
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -126,6 +145,9 @@ public class FileListDisplay extends AppCompatActivity {
                 return true;
             }
         });
+
+        //updateSortOrderCheckBox();
+
     }
 
     /**
@@ -206,22 +228,86 @@ public class FileListDisplay extends AppCompatActivity {
                     System.out.println("***\n FILE FOUND - " + f.getAbsolutePath()+"\nSIZE - " +
                             f.length() + " BYTES \n***");
                     fileNames.add(f.getName());
-
                     fileSizes.add(f.length()+"");
+                    this.files.add(f);
                 }
             }
         }
     }
 
     /**
-     * Activity to take user back to homepage
-     * @param item
-     * @return
+     * Method to inflate action bar with sorting options for file selection
+     * @param menu - menu to be inflated
+     * @return true
      */
-    public boolean onOptionsItemSelected(MenuItem item){
-        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(myIntent, 0);
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.file_sorting_options, menu);
+
+        sortMenu = menu;
+
+        MenuItem alphabeticalSort = sortMenu.findItem(R.id.menuSortAlphabetically);
+        alphabeticalSort.setChecked(true);
+
         return true;
     }
 
+    /**
+     * Activity to determine what item on the action bar is clicked
+     * @param item - item clicked
+     * @return true
+     */
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case(android.R.id.home):
+                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivityForResult(myIntent, 0);
+                break;
+            case(R.id.menuSortDate):
+                Toast.makeText(this,"Sorted by date created", Toast.LENGTH_LONG).show();
+                fileListAdapter.sortDateCreated(); //sort files by date created
+                fileListAdapter.notifyDataSetChanged();
+                sortOrder = SortOrder.DATE; //update sort order
+                break;
+            case(R.id.menuSortAlphabetically):
+                Toast.makeText(this,"Sorted alphabetically", Toast.LENGTH_LONG).show();
+                fileListAdapter.sortAlphabetically(); //sort files by alphabetical order
+                fileListAdapter.notifyDataSetChanged();
+                sortOrder = SortOrder.ALPHABETICAL; //update sort order
+                break;
+            case(R.id.menuSortFileType):
+                Toast.makeText(this,"Sorted by file type", Toast.LENGTH_LONG).show();
+                fileListAdapter.sortFileType();
+                fileListAdapter.notifyDataSetChanged();
+                sortOrder = SortOrder.FILETYPE; //update sort order
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        updateSortOrderCheckBox(); //update checkboxes of sort order dropdown
+        return true;
+
+    }
+
+    /**
+     * Method to update the sort order checkboxes
+     */
+    private void updateSortOrderCheckBox(){
+        MenuItem alphabeticalSortItem = sortMenu.findItem(R.id.menuSortAlphabetically);
+        MenuItem dateSortItem = sortMenu.findItem(R.id.menuSortDate);
+        MenuItem fileTypeSortItem = sortMenu.findItem(R.id.menuSortFileType);
+        if(sortOrder == SortOrder.ALPHABETICAL){
+            alphabeticalSortItem.setChecked(true);
+            dateSortItem.setChecked(false);
+            fileTypeSortItem.setChecked(false);
+        } else if (sortOrder == SortOrder.DATE){
+            alphabeticalSortItem.setChecked(false);
+            dateSortItem.setChecked(true);
+            fileTypeSortItem.setChecked(false);
+        } else if (sortOrder == SortOrder.FILETYPE){
+            alphabeticalSortItem.setChecked(false);
+            dateSortItem.setChecked(false);
+            fileTypeSortItem.setChecked(true);
+        }
+    }
 }

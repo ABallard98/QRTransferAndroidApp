@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip" >
+    android:padding="6dip">
 
     <ImageView
         android:id="@+id/icon"
@@ -23,7 +23,7 @@
         android:layout_toRightOf="@id/icon"
         android:gravity="left"
         android:textSize="16sp"
-
+        android:textColor="#FFFFFF"
         android:maxLines="1"
         android:maxLength="20"
         android:ellipsize="end"/>
@@ -36,7 +36,7 @@
         android:layout_toRightOf="@id/icon"
         android:gravity="left"
         android:textSize="16sp"
-
+        android:textColor="#FFFFFF"
         android:maxLines="1"
         android:maxLength="20"
         android:ellipsize="end"/>

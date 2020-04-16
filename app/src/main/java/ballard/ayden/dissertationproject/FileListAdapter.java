@@ -10,7 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 /**
@@ -22,7 +26,8 @@ import java.util.*;
 public class FileListAdapter extends ArrayAdapter<String> {
 
     private ArrayList<String> fileNames; //ArrayList of file names
-    private Context context;
+    private ArrayList<File> files; //ArrayList of files
+    private Context context; //Application context
 
     /**
      * Constructor for file list adapter object
@@ -30,11 +35,67 @@ public class FileListAdapter extends ArrayAdapter<String> {
      * @param file_display
      * @param fileNames - ArrayList of file names
      */
-    public FileListAdapter(Context context, int file_display, ArrayList<String> fileNames){
+    public FileListAdapter(Context context, int file_display, ArrayList<String> fileNames, ArrayList<File> files){
         super(context, file_display, fileNames);
+        this.files = files;
+
+        fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically by default
+
         this.fileNames = fileNames;
         this.context = context;
     }
+
+    /**
+     * Method to sort the list of files in alphabetical order
+     */
+    public void sortAlphabetically(){
+       fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically
+    }
+
+    /**
+     * Method to sort the list of files by file extension
+     */
+   public void sortFileType(){
+        files.sort((o1, o2) -> {
+           String f1 = FilenameUtils.getExtension(o1.getName());
+           String f2 = FilenameUtils.getExtension(o2.getName());
+           return String.valueOf(f1).compareTo(f2);
+        });
+        this.fileNames.clear();
+        for(File f: files){
+            this.fileNames.add(f.getName());
+        }
+   }
+
+    /**
+     * Method to sort the list of files by date created
+     */
+    public void sortDateCreated(){
+        fileNames.sort(String::compareToIgnoreCase); //alphabetical sort first
+        files.sort((o1, o2) -> {
+            long f1 = getFileDateCreated(o1);
+            long f2 = getFileDateCreated(o2);
+            return Long.valueOf(f1).compareTo(f2);
+        });
+        this.fileNames.clear();
+        for(File f : files){
+            this.fileNames.add(f.getName());
+        }
+    }
+
+    /**
+     * Method to get the date created of a file from its meta-data
+     * @param file - file to find its date of creation
+     * @return Long - date created
+     */
+    private long getFileDateCreated(File file){
+        try{
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            return attr.creationTime().toInstant().toEpochMilli();
+        } catch(Exception e){
+            throw new RuntimeException(file.getAbsolutePath(), e);
+        }
+   }
 
     /**
      * Method to generate rows for the ListView
@@ -45,6 +106,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         LayoutInflater inflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.file_display, parent, false);
@@ -62,15 +124,8 @@ public class FileListAdapter extends ArrayAdapter<String> {
                     + FileManager.getFileExtension(fileToDisplay);
         }
         firstLine.setText(fileName);
-
-        //set memory label
-        final int BYTES_IN_MEGABYTE = 1000000;
-        String fileSize = (fileToDisplay.length()+" Bytes");
-        if(fileToDisplay.length()/BYTES_IN_MEGABYTE > 1){ //if file size > 1mb
-            long megaBytes = (fileToDisplay.length()/BYTES_IN_MEGABYTE);
-            fileSize = (megaBytes+" MB");
-        }
-        secondLine.setText(fileSize);
+        //set file size label
+        secondLine.setText(getFileSizeToString(fileToDisplay));
 
         //set thumbnail
         imageView.setImageResource(R.drawable.ic_play_dark); //default thumbnail
@@ -83,11 +138,30 @@ public class FileListAdapter extends ArrayAdapter<String> {
                 imageView.setImageBitmap(thumbnail);
             }
         }
-
         return rowView;
     }
 
-
+    /**
+     * Method to convert byte size of file into a more readable format
+     * @param file - file to get size of
+     * @return String - file size in a readable format
+     */
+    public static String getFileSizeToString(File file){
+        int fileSizeBytes = (int) file.length();
+        if(fileSizeBytes > 1000000){ //if file size is larger than 1mb
+            long fileSizeMb = Math.round(fileSizeBytes / Math.pow(1024,2));
+            String toReturn = fileSizeMb + "mb";
+            return toReturn;
+        } else if(fileSizeBytes > 1000){ //if file size is larger than 1kb
+            long fileSizeKb = fileSizeBytes / 1000;
+            String toReturn = fileSizeKb + "kb";
+            return toReturn;
+        }
+        else { //else return as bytes
+            String toReturn = fileSizeBytes + " bytes";
+            return toReturn;
+        }
+    }
 
 
 

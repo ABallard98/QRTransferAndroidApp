@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:icon="@drawable/ic_sort_white"
+        app:showAsAction="ifRoom"
+        android:title="SortingOptions">
+        <menu>
+            <item
+                android:id="@+id/menuSortAlphabetically"
+                android:title="Sort Alphabetically"
+                android:checkable="true"/>
+            <item
+                android:id="@+id/menuSortFileType"
+                android:title="Sort by File Type"
+                android:checkable="true"/>
+            <item
+                android:id="@+id/menuSortDate"
+                android:title="Sort by Date"
+                android:checkable="true"/>
+        </menu>
+    </item>
+</menu>

@@ -47,7 +47,6 @@ public class DownloadFileActivity extends AppCompatActivity {
         //action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         //download button and file type image to be invisible till QR code scanned
         downloadButton.setVisibility(View.INVISIBLE);
         fileTypeImageView.setVisibility(View.INVISIBLE);
@@ -194,7 +193,6 @@ public class DownloadFileActivity extends AppCompatActivity {
         startActivityForResult(myIntent, 0);
         return true;
     }
-
 
     /**
      * Method to take the image taken by the user and decode the QR code in image if it exists

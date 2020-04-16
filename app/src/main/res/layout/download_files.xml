@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:name=".MainActivity"
     android:label="QR File Transfer"
-    android:background="@color/background_theme"
+    android:background="#BE000000"
     tools:context=".MainActivity">
 
 
@@ -34,7 +34,6 @@
 
             <Button
                 android:id="@+id/cameraButton"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="71dp"
                 android:onClick="takePicture"
@@ -54,7 +53,6 @@
 
             <Button
                 android:id="@+id/downloadButton"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="115dp"
                 android:onClick="downloadButtonOnClick"

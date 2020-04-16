@@ -76,7 +76,6 @@ public class FoundTextReader {
      */
     public static String readFileSizeString(String foundText){
         int fileSizeBytes = readFileSizeBytes(foundText);
-
         if(fileSizeBytes > 1000000){
             long fileSizeMb = Math.round(fileSizeBytes / Math.pow(1024,2));
             String toReturn = fileSizeMb + "mb";
@@ -85,8 +84,6 @@ public class FoundTextReader {
             String toReturn = fileSizeBytes + " bytes";
             return toReturn;
         }
-
     }
-
 
 }
