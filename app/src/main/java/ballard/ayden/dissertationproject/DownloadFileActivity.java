@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
@@ -32,6 +33,7 @@ public class DownloadFileActivity extends AppCompatActivity {
     private ImageView fileTypeImageView; //image view for the file type
     private Button takePicButton; //button to prompt user to take a picture using camera
     private Button downloadButton; //transfer button to upload file to server
+    private ProgressBar progressBar;
     private static final int REQUEST_IMAGE_CAPTURE = 1337;
 
     @Override
@@ -43,9 +45,13 @@ public class DownloadFileActivity extends AppCompatActivity {
         downloadButton = findViewById(R.id.downloadButton);
         cameraPicTaken = findViewById(R.id.qrCode);
         fileTypeImageView = findViewById(R.id.fileTypeImageView);
+        progressBar = findViewById(R.id.progressBar);
 
         //action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //progress bar should be invisible on launch
+        progressBar.setVisibility(View.INVISIBLE);
 
         //download button and file type image to be invisible till QR code scanned
         downloadButton.setVisibility(View.INVISIBLE);
@@ -66,6 +72,10 @@ public class DownloadFileActivity extends AppCompatActivity {
             //if no picture has been taken yet
             return;
         } else{
+
+            //make progress bar visible
+            progressBar.setVisibility(View.VISIBLE);
+
             //Bitmap image to scan
             BitmapDrawable drawable = (BitmapDrawable) cameraPicTaken.getDrawable();
             Bitmap toScan = drawable.getBitmap();
@@ -92,21 +102,10 @@ public class DownloadFileActivity extends AppCompatActivity {
                 String fileName = FoundTextReader.readFileName(foundText);
                 int fileSize = FoundTextReader.readFileSizeBytes(foundText);
 
-                //create FileTransferDownload thread
+                //Create and run FileTransferDownload Async task
                 FileTransferDownload fileTransferDownload =
-                        new FileTransferDownload(ipAddress,port,fileName,fileSize);
-                fileTransferDownload.run(this);
-
-                //load image into imageView
-                cameraPicTaken.setImageBitmap(BitmapFactory.decodeFile(
-                        MainActivity.DB_PATH+"/"+fileName));
-
-                //alert user file was successfully downloaded
-                Toast.makeText(this, "FILE DOWNLOADED", Toast.LENGTH_LONG).show();
-
-                //return user to MainActivity
-                Intent mainActivityIntent = new Intent(this, MainActivity.class);
-                this.startActivity(mainActivityIntent);
+                        new FileTransferDownload(this, progressBar, ipAddress,port,fileName,fileSize);
+                fileTransferDownload.execute();
 
             } catch (Exception e){
                 e.printStackTrace();

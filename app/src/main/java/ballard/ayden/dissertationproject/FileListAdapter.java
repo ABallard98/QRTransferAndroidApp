@@ -3,6 +3,7 @@ package ballard.ayden.dissertationproject;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import java.util.*;
 
 public class FileListAdapter extends ArrayAdapter<String> {
 
+    public static ArrayList<FileWithThumbnail> fwtList; //acts as a cache for file/thumbnail combo
     private ArrayList<String> fileNames; //ArrayList of file names
     private ArrayList<File> files; //ArrayList of files
     private Context context; //Application context
@@ -41,6 +43,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
         super(context, file_display, fileNames);
         this.files = files;
         this.fileNames = fileNames;
+        this.fwtList = new ArrayList<>();
         this.context = context;
 
         fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically by default
@@ -133,25 +136,25 @@ public class FileListAdapter extends ArrayAdapter<String> {
         secondLine.setText(getFileSizeToString(fileToDisplay));
 
         //set thumbnail
-        imageView.setImageResource(R.drawable.ic_play_dark); //default thumbnail
+        //imageView.setImageResource(R.drawable.ic_play_dark); //default thumbnail
+
         File file = FileManager.findFile(fileNames.get(position));
         if(file != null){ //assign thumbnail
-            if(fileNames.get(position).contains(".pdf")){ //if pdf file
-                imageView.setImageResource(R.drawable.ic_pdf);
-            } else if(fileNames.get(position).contains(".mp4")){ //if video file
-//                Bitmap videoThumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),
-//                        MediaStore.Images.Thumbnails.MINI_KIND);
-//                imageView.setImageBitmap(videoThumbnail);
-                new ThumbnailCreatorTask(imageView,file).execute(file);
+            if(getFwt(file) != null){
+                imageView.setImageBitmap(getFwt(file).getBitmap());
+            } else {
+                if (fileNames.get(position).contains(".pdf")) { //if pdf file
+                    imageView.setImageResource(R.drawable.ic_pdf);
+                    //add file to ftw ArrayList here
+                    FileWithThumbnail fwt = new FileWithThumbnail(file,
+                            ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+                    fwtList.add(fwt);
+                } else if (fileNames.get(position).contains(".mp4")) { //if video file
+                    new ThumbnailCreatorTask(imageView, file).execute(file);
+                } else {
+                    new ThumbnailCreatorTask(imageView, file).execute(file);
+                }
             }
-            else { //else its an image
-//                Bitmap thumbnail = BitmapFactory.decodeFile(file.getAbsolutePath());
-//                imageView.setImageBitmap(thumbnail);
-                new ThumbnailCreatorTask(imageView,file).execute(file);
-            }
-
-
-
         }
         return rowView;
     }
@@ -176,6 +179,15 @@ public class FileListAdapter extends ArrayAdapter<String> {
             String toReturn = fileSizeBytes + " bytes";
             return toReturn;
         }
+    }
+
+    private FileWithThumbnail getFwt(File file){
+        for(FileWithThumbnail f : fwtList){
+            if(f.getFile().getAbsolutePath().equals(file.getAbsolutePath())){
+                return f;
+            }
+        }
+        return null;
     }
 
 }

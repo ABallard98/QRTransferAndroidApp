@@ -53,6 +53,8 @@ public class ThumbnailCreatorTask extends AsyncTask<File, Void, Bitmap> {
         ImageView temp = imageView.get();
         if(temp != null && bitmap != null){
             temp.setImageBitmap(bitmap);
+            //add file to file/thumbnail cache in FileListAdapter
+            FileListAdapter.fwtList.add(new FileWithThumbnail(file,bitmap));
         }
       }
     }
@@ -63,7 +65,7 @@ public class ThumbnailCreatorTask extends AsyncTask<File, Void, Bitmap> {
      * @return Bitmap - generated thumbnail
      */
     private Bitmap getThumbnail(File file){
-        Bitmap thumbnail = null;
+        Bitmap thumbnail;
         if(file.getName().contains(".mp4")){
             thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),
                     MediaStore.Images.Thumbnails.MINI_KIND);
