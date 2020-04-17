@@ -96,7 +96,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_sort_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_music_video_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -107,7 +107,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_sort_white" />
+                            <entry key="outputName" value="ic_music_video_black" />
                             <entry key="sourceFile" value="C:\Users\Ayden" />
                           </map>
                         </option>

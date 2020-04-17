@@ -154,7 +154,10 @@ public class DownloadFileActivity extends AppCompatActivity {
             //set file type image view
             if(fileName.contains(".pdf")){
                 this.fileTypeImageView.setImageResource(R.drawable.ic_pdf);
-            } else if(fileName.contains(".png") || fileName.contains(".jpg")){
+            } else if(fileName.contains(".mp4")){
+                this.fileTypeImageView.setImageResource(R.drawable.ic_music_video_black);
+            }
+            else if(fileName.contains(".png") || fileName.contains(".jpg")){
                 this.fileTypeImageView.setImageResource(R.drawable.image_icon);
             }
 

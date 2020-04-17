@@ -3,6 +3,8 @@ package ballard.ayden.dissertationproject;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +40,10 @@ public class FileListAdapter extends ArrayAdapter<String> {
     public FileListAdapter(Context context, int file_display, ArrayList<String> fileNames, ArrayList<File> files){
         super(context, file_display, fileNames);
         this.files = files;
-
-        fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically by default
-
         this.fileNames = fileNames;
         this.context = context;
+
+        fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically by default
     }
 
     /**
@@ -61,6 +62,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
            String f2 = FilenameUtils.getExtension(o2.getName());
            return String.valueOf(f1).compareTo(f2);
         });
+        //replace filenames array list with sorted list of names
         this.fileNames.clear();
         for(File f: files){
             this.fileNames.add(f.getName());
@@ -77,6 +79,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
             long f2 = getFileDateCreated(o2);
             return Long.valueOf(f1).compareTo(f2);
         });
+        //replace filenames array list with sorted list of names
         this.fileNames.clear();
         for(File f : files){
             this.fileNames.add(f.getName());
@@ -90,7 +93,8 @@ public class FileListAdapter extends ArrayAdapter<String> {
      */
     private long getFileDateCreated(File file){
         try{
-            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            BasicFileAttributes attr =
+                    Files.readAttributes(file.toPath(), BasicFileAttributes.class);
             return attr.creationTime().toInstant().toEpochMilli();
         } catch(Exception e){
             throw new RuntimeException(file.getAbsolutePath(), e);
@@ -123,6 +127,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
             fileName = fileName.substring(0,12) + "..."
                     + FileManager.getFileExtension(fileToDisplay);
         }
+
         firstLine.setText(fileName);
         //set file size label
         secondLine.setText(getFileSizeToString(fileToDisplay));
@@ -133,10 +138,20 @@ public class FileListAdapter extends ArrayAdapter<String> {
         if(file != null){ //assign thumbnail
             if(fileNames.get(position).contains(".pdf")){ //if pdf file
                 imageView.setImageResource(R.drawable.ic_pdf);
-            } else { //else its an image
-                Bitmap thumbnail = BitmapFactory.decodeFile(file.getAbsolutePath());
-                imageView.setImageBitmap(thumbnail);
+            } else if(fileNames.get(position).contains(".mp4")){ //if video file
+//                Bitmap videoThumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),
+//                        MediaStore.Images.Thumbnails.MINI_KIND);
+//                imageView.setImageBitmap(videoThumbnail);
+                new ThumbnailCreatorTask(imageView,file).execute(file);
             }
+            else { //else its an image
+//                Bitmap thumbnail = BitmapFactory.decodeFile(file.getAbsolutePath());
+//                imageView.setImageBitmap(thumbnail);
+                new ThumbnailCreatorTask(imageView,file).execute(file);
+            }
+
+
+
         }
         return rowView;
     }
@@ -162,7 +177,5 @@ public class FileListAdapter extends ArrayAdapter<String> {
             return toReturn;
         }
     }
-
-
 
 }

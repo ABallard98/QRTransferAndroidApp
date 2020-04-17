@@ -29,21 +29,20 @@ import java.util.ArrayList;
 
 public class FileListDisplay extends AppCompatActivity {
 
-    private ArrayList<String> fileNames; //ArrayList of the file names
-    private ArrayList<String> fileSizes; //ArrayList of the file sizes (in bytes)
-    private ArrayList<File> files;
-    private FileListAdapter fileListAdapter;
-    private ListView listView;
 
-    private Menu sortMenu;
-
-    private enum SortOrder {
+    private enum SortOrder { //enum for current sort order
         ALPHABETICAL,
         DATE,
         FILETYPE
     }
 
-    private SortOrder sortOrder;
+    private ArrayList<String> fileNames; //ArrayList of the file names
+    private ArrayList<String> fileSizes; //ArrayList of the file sizes (in bytes)
+    private ArrayList<File> files; //ArrayList of files
+    private FileListAdapter fileListAdapter; //Adapter for file view
+    private ListView listView; //ListView to contain files downloaded
+    private SortOrder sortOrder; //sort order enum
+    private Menu sortMenu; //sort menu dropdown
 
     /**
      * Method to initializer FileListDisplay
@@ -66,87 +65,76 @@ public class FileListDisplay extends AppCompatActivity {
         //Sort order alphabetical by default
         this.sortOrder = SortOrder.ALPHABETICAL;
 
-
         //action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Initializing FileListAdapter
-                 this.fileListAdapter = new FileListAdapter(this,
-                R.layout.file_display,fileNames, files);
-         this.listView = findViewById(R.id.fileListView);
-         listView.setAdapter(fileListAdapter);
+        this.fileListAdapter =
+                new FileListAdapter(this, R.layout.file_display,fileNames, files);
+        this.listView = findViewById(R.id.fileListView);
+        listView.setAdapter(fileListAdapter);
 
         //on click listener to open downloaded files
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                try{
-                    String filename = fileNames.get(position);
-                    File fileToOpen = FileManager.findFile(filename);
-                    if(filename.contains(".pdf")){ //If the file is a PDF
-                       launchPdfFile(fileToOpen);
-                    }
-                    //image MIME types
-                    else if (filename.contains(".png") || filename.contains(".jpg") ||
-                            filename.contains(".jpeg")) { //If the file is an image
-                        launchImageFile(fileToOpen);
-                    }
-                    else if (filename.contains(".mp4")){
-                        launchVideoFile(fileToOpen);
-                    }
-                } catch (Exception e){
-                    e.printStackTrace();
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            try{
+                String filename = fileNames.get(position);
+                File fileToOpen = FileManager.findFile(filename);
+                if(filename.contains(".pdf")){ //If the file is a PDF
+                   launchPdfFile(fileToOpen);
                 }
+                //image MIME types
+                else if (filename.contains(".png") || filename.contains(".jpg") ||
+                        filename.contains(".jpeg")) { //If the file is an image
+                    launchImageFile(fileToOpen);
+                }
+                else if (filename.contains(".mp4")){ //video file types
+                    launchVideoFile(fileToOpen);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
             }
         });
 
         //on long click listener to delete a downloaded file
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int pos, long id) {
-                try{
-                    final int filePos = pos; //must be final for internal method
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch(which){
-                                case(DialogInterface.BUTTON_POSITIVE):
+        listView.setOnItemLongClickListener((arg0, arg1, pos, id) -> {
+            try{
+                final int filePos = pos; //must be final for internal method
+                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                    switch(which){
+                        case(DialogInterface.BUTTON_POSITIVE): //if user selects yes
 
-                                    //Delete file from internal and external storage
-                                    FileManager.deleteFileInternalExternal(fileNames.get(filePos));
-                                    //remove from names and size array lists
-                                    fileNames.remove(filePos);
-                                    fileSizes.remove(filePos);
+                            //Delete file from internal and external storage
+                            FileManager.deleteFileInternalExternal(fileNames.get(filePos));
+                            //remove from names and size array lists
+                            fileNames.remove(filePos);
+                            fileSizes.remove(filePos);
 
-                                    //re-initialize the array of downloaded files
-                                    fileListAdapter.notifyDataSetChanged();
+                            //re-initialize the array of downloaded files
+                            fileListAdapter.notifyDataSetChanged();
 
-                                    //alert user file was deleted
-                                    Toast.makeText(getApplicationContext(),
-                                            "File Deleted ", Toast.LENGTH_LONG)
-                                            .show();
-                                    break;
-                                case(DialogInterface.BUTTON_NEGATIVE):
-                                    break;
-                            }
-                        }
-                    };
-                    //Building dialog popup for file deletion confirmation
-                    AlertDialog.Builder builder = new AlertDialog.Builder(FileListDisplay.this);
-                    builder.setTitle(R.string.delete_dialog_title);
-                    builder.setPositiveButton("Yes", dialogClickListener);
-                    builder.setNegativeButton("No", dialogClickListener);
-                    builder.show();
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-                return true;
+                            //alert user file was deleted
+                            Toast.makeText(getApplicationContext(),
+                                    "File Deleted ", Toast.LENGTH_LONG)
+                                    .show();
+                            break;
+                        case(DialogInterface.BUTTON_NEGATIVE):
+                            break;
+                    }
+                };
+
+                //Building dialog popup for file deletion confirmation
+                AlertDialog.Builder builder1 =
+                        new AlertDialog.Builder(FileListDisplay.this);
+                builder1.setTitle(R.string.delete_dialog_title);
+                builder1.setPositiveButton("Yes", dialogClickListener);
+                builder1.setNegativeButton("No", dialogClickListener);
+                builder1.show(); //show popup dialog confirmation
+
+            } catch(Exception e){
+                e.printStackTrace();
             }
+            return true;
         });
-
-        //updateSortOrderCheckBox();
 
     }
 
@@ -185,7 +173,7 @@ public class FileListDisplay extends AppCompatActivity {
             objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(objIntent);//Starting the video viewer
         } else {
-            Toast.makeText(this, "Error: This file does not exists! ",
+            Toast.makeText(this, "Error: This file does not exist.",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -209,7 +197,7 @@ public class FileListDisplay extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, "Error: This file does not exists! ",
+            Toast.makeText(this, "Error: This file does not exist.",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -243,12 +231,9 @@ public class FileListDisplay extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_sorting_options, menu);
-
         sortMenu = menu;
-
         MenuItem alphabeticalSort = sortMenu.findItem(R.id.menuSortAlphabetically);
-        alphabeticalSort.setChecked(true);
-
+        alphabeticalSort.setChecked(true); //check alphabetical sort by default
         return true;
     }
 
@@ -259,23 +244,23 @@ public class FileListDisplay extends AppCompatActivity {
      */
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
-            case(android.R.id.home):
+            case(android.R.id.home): //if home (back) button is pressed
                 Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivityForResult(myIntent, 0);
                 break;
-            case(R.id.menuSortDate):
+            case(R.id.menuSortDate): //if sort by date selected
                 Toast.makeText(this,"Sorted by date created", Toast.LENGTH_LONG).show();
                 fileListAdapter.sortDateCreated(); //sort files by date created
                 fileListAdapter.notifyDataSetChanged();
                 sortOrder = SortOrder.DATE; //update sort order
                 break;
-            case(R.id.menuSortAlphabetically):
+            case(R.id.menuSortAlphabetically): //if sort alphabetically selected
                 Toast.makeText(this,"Sorted alphabetically", Toast.LENGTH_LONG).show();
                 fileListAdapter.sortAlphabetically(); //sort files by alphabetical order
                 fileListAdapter.notifyDataSetChanged();
                 sortOrder = SortOrder.ALPHABETICAL; //update sort order
                 break;
-            case(R.id.menuSortFileType):
+            case(R.id.menuSortFileType): //if sort by file type selected
                 Toast.makeText(this,"Sorted by file type", Toast.LENGTH_LONG).show();
                 fileListAdapter.sortFileType();
                 fileListAdapter.notifyDataSetChanged();
@@ -286,7 +271,6 @@ public class FileListDisplay extends AppCompatActivity {
         }
         updateSortOrderCheckBox(); //update checkboxes of sort order dropdown
         return true;
-
     }
 
     /**
