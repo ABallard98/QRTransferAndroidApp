@@ -32,7 +32,6 @@
         <activity android:name=".ImageViewActivity"></activity>
         <activity android:name=".GenerateQrActivity"></activity>
 
-
     </application>
 
 

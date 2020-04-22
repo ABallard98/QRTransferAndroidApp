@@ -33,7 +33,8 @@ public class FileListDisplay extends AppCompatActivity {
     private enum SortOrder { //enum for current sort order
         ALPHABETICAL,
         DATE,
-        FILETYPE
+        FILE_TYPE,
+        FILE_SIZE
     }
 
     private ArrayList<String> fileNames; //ArrayList of the file names
@@ -264,8 +265,16 @@ public class FileListDisplay extends AppCompatActivity {
                 Toast.makeText(this,"Sorted by file type", Toast.LENGTH_LONG).show();
                 fileListAdapter.sortFileType();
                 fileListAdapter.notifyDataSetChanged();
-                sortOrder = SortOrder.FILETYPE; //update sort order
+                sortOrder = SortOrder.FILE_TYPE; //update sort order
                 break;
+            case(R.id.menuSortFileSize):
+                Toast.makeText(this,"Sorted by file size", Toast.LENGTH_LONG).show();
+                fileListAdapter.sortFileSize();
+                fileListAdapter.notifyDataSetChanged();
+                sortOrder = SortOrder.FILE_SIZE;
+                break;
+//                MenuItem fileSizeSortItem = sortMenu.findItem(R.id.menuSortFileSize);
+//                fileSizeSortItem.setChecked(true);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -280,18 +289,27 @@ public class FileListDisplay extends AppCompatActivity {
         MenuItem alphabeticalSortItem = sortMenu.findItem(R.id.menuSortAlphabetically);
         MenuItem dateSortItem = sortMenu.findItem(R.id.menuSortDate);
         MenuItem fileTypeSortItem = sortMenu.findItem(R.id.menuSortFileType);
+        MenuItem fileSizeSortItem = sortMenu.findItem(R.id.menuSortFileSize);
         if(sortOrder == SortOrder.ALPHABETICAL){
             alphabeticalSortItem.setChecked(true);
             dateSortItem.setChecked(false);
             fileTypeSortItem.setChecked(false);
+            fileSizeSortItem.setChecked(false);
         } else if (sortOrder == SortOrder.DATE){
             alphabeticalSortItem.setChecked(false);
             dateSortItem.setChecked(true);
             fileTypeSortItem.setChecked(false);
-        } else if (sortOrder == SortOrder.FILETYPE){
+            fileSizeSortItem.setChecked(false);
+        } else if (sortOrder == SortOrder.FILE_TYPE){
             alphabeticalSortItem.setChecked(false);
             dateSortItem.setChecked(false);
             fileTypeSortItem.setChecked(true);
+            fileSizeSortItem.setChecked(false);
+        }  else if(sortOrder == SortOrder.FILE_SIZE){
+            alphabeticalSortItem.setChecked(false);
+            dateSortItem.setChecked(false);
+            fileTypeSortItem.setChecked(false);
+            fileSizeSortItem.setChecked(true);
         }
     }
 }

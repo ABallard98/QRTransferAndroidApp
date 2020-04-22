@@ -35,11 +35,12 @@ public class FileListAdapter extends ArrayAdapter<String> {
 
     /**
      * Constructor for file list adapter object
-     * @param context - Context
+     *
+     * @param context      - Context
      * @param file_display
-     * @param fileNames - ArrayList of file names
+     * @param fileNames    - ArrayList of file names
      */
-    public FileListAdapter(Context context, int file_display, ArrayList<String> fileNames, ArrayList<File> files){
+    public FileListAdapter(Context context, int file_display, ArrayList<String> fileNames, ArrayList<File> files) {
         super(context, file_display, fileNames);
         this.files = files;
         this.fileNames = fileNames;
@@ -52,30 +53,30 @@ public class FileListAdapter extends ArrayAdapter<String> {
     /**
      * Method to sort the list of files in alphabetical order
      */
-    public void sortAlphabetically(){
-       fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically
+    public void sortAlphabetically() {
+        fileNames.sort(String::compareToIgnoreCase); //sort files alphabetically
     }
 
     /**
      * Method to sort the list of files by file extension
      */
-   public void sortFileType(){
+    public void sortFileType() {
         files.sort((o1, o2) -> {
-           String f1 = FilenameUtils.getExtension(o1.getName());
-           String f2 = FilenameUtils.getExtension(o2.getName());
-           return String.valueOf(f1).compareTo(f2);
+            String f1 = FilenameUtils.getExtension(o1.getName());
+            String f2 = FilenameUtils.getExtension(o2.getName());
+            return String.valueOf(f1).compareTo(f2);
         });
         //replace filenames array list with sorted list of names
         this.fileNames.clear();
-        for(File f: files){
+        for (File f : files) {
             this.fileNames.add(f.getName());
         }
-   }
+    }
 
     /**
      * Method to sort the list of files by date created
      */
-    public void sortDateCreated(){
+    public void sortDateCreated() {
         fileNames.sort(String::compareToIgnoreCase); //alphabetical sort first
         files.sort((o1, o2) -> {
             long f1 = getFileDateCreated(o1);
@@ -84,7 +85,23 @@ public class FileListAdapter extends ArrayAdapter<String> {
         });
         //replace filenames array list with sorted list of names
         this.fileNames.clear();
-        for(File f : files){
+        for (File f : files) {
+            this.fileNames.add(f.getName());
+        }
+    }
+
+    /**
+     * Method to sort the list of files by file size
+     */
+    public void sortFileSize() {
+        files.sort((o1, o2) ->  {
+            long f1 = o1.length();
+            long f2 = o2.length();
+            return Long.valueOf(f1).compareTo(f2);
+        });
+        Collections.reverse(files);
+        this.fileNames.clear();
+        for (File f : files) {
             this.fileNames.add(f.getName());
         }
     }
