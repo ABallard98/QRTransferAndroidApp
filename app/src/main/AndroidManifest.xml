@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ballard.ayden.dissertationproject">
+    package="ballard.ayden.QRTransfer">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
 
-        <activity android:name=".MainActivity"
+        <activity android:name="ballard.ayden.QRTransfer.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,9 +28,9 @@
         </activity>
 
         <activity android:name=".DownloadFileActivity"></activity>
-        <activity android:name=".FileListDisplay"></activity>
-        <activity android:name=".ImageViewActivity"></activity>
-        <activity android:name=".GenerateQrActivity"></activity>
+        <activity android:name="ballard.ayden.QRTransfer.FileListDisplay"></activity>
+        <activity android:name="ballard.ayden.QRTransfer.ImageViewActivity"></activity>
+        <activity android:name="ballard.ayden.QRTransfer.GenerateQrActivity"></activity>
 
     </application>
 

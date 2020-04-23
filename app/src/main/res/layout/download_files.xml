@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:name=".MainActivity"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="#BE000000"
     android:label="QR File Transfer"
     tools:context=".MainActivity">
 
 
     <FrameLayout
+        android:id="@+id/cameraFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/cameraFrame">
+        android:layout_height="match_parent">
 
     </FrameLayout>
 
@@ -21,13 +21,8 @@
         android:id="@+id/linearLayout"
         android:layout_width="411dp"
         android:layout_height="729dp"
-        android:layout_marginTop="109dp"
-        android:layout_marginBottom="109dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:layout_editor_absoluteY="1dp">
 
         <ImageView
             android:id="@+id/qrCode"
@@ -37,7 +32,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="51dp"
             android:orientation="horizontal">
 
         </LinearLayout>
@@ -47,12 +42,23 @@
             android:layout_height="287dp"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/downloadProgressTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Download Progress:"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:visibility="invisible" />
+
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:layout_weight="0"
                 android:max="100"
                 android:visibility="visible"
                 tools:visibility="visible" />
@@ -76,13 +82,6 @@
                     android:text="Download" />
 
             </LinearLayout>
-
-            <Button
-                android:id="@+id/cameraButton"
-                android:layout_width="match_parent"
-                android:layout_height="71dp"
-                android:onClick="takePicture"
-                android:text="Take Pic" />
 
         </LinearLayout>
 
