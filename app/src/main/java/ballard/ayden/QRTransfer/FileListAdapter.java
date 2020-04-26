@@ -1,7 +1,10 @@
 package ballard.ayden.QRTransfer;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,9 +162,16 @@ public class FileListAdapter extends ArrayAdapter<String> {
                     FileWithThumbnail fwt = new FileWithThumbnail(file,
                             ((BitmapDrawable) imageView.getDrawable()).getBitmap());
                     fwtList.add(fwt);
-                } else if (fileNames.get(position).contains(".mp4")) { //if video file
+                }
+                else if (fileNames.get(position).contains(".mp4")) { //if video file
                     new ThumbnailCreatorTask(imageView, file).execute(file);
-                } else {
+                }
+                else if (fileNames.get(position).contains(".apk")) { //if apk file
+                    PackageManager pm = context.getPackageManager();
+                    PackageInfo pi = pm.getPackageArchiveInfo(file.getAbsolutePath(), 0);
+                    imageView.setImageDrawable(pi.applicationInfo.loadIcon(pm));
+                }
+                else {
                     new ThumbnailCreatorTask(imageView, file).execute(file);
                 }
             }

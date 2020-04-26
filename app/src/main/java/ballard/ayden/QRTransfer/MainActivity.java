@@ -1,11 +1,15 @@
 package ballard.ayden.QRTransfer;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.net.Socket;
 
 /**
  * This class acts as the controller for the MainActivity. This activity is opened at launch and
@@ -21,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private Button downloadFileButton; //button to launch downloaded files activity
     private Button selectFileButton; //button to launch generate QR activity
     private ImageView logoImageView; //image view for logo
+    private TextView serverStatusTextView; //text view for server status
+
 
     /**
      * Initializer for Main activity
@@ -35,9 +41,17 @@ public class MainActivity extends AppCompatActivity {
         downloadFileButton = findViewById(R.id.downloadFileButton);
         selectFileButton = findViewById(R.id.selectFileButton);
         logoImageView = findViewById(R.id.logoImageView);
+        serverStatusTextView = findViewById(R.id.serverStatusTextView);
 
         logoImageView.setImageResource(R.drawable.qrlogo);
         DB_PATH =  getFilesDir().getAbsolutePath(); //assign file directory for app
+
+        serverStatusTextView.setText("Server status: Offline");
+        serverStatusTextView.setTextColor(Color.RED);
+
+        //checking for server status
+        checkServerStatus();
+
 
     } //end of onCreate
 
@@ -66,6 +80,23 @@ public class MainActivity extends AppCompatActivity {
     public void launchGenerateQrActivity(View v){
         Intent generateQrIntent = new Intent(this, GenerateQrActivity.class);
         this.startActivity(generateQrIntent);
+    }
+
+    private void checkServerStatus(){
+        Thread thread = new Thread(() -> {
+            try{
+                Socket testSocket = new Socket("86.157.154.4", 8007);
+                if(testSocket.isConnected()) {
+                    serverStatusTextView.setText("Server status: Online");
+                    serverStatusTextView.setTextColor(Color.GREEN);
+                }
+                testSocket.close();
+            } catch (Exception e){
+                e.printStackTrace();
+
+            }
+        });
+        thread.start();
     }
 
 

@@ -72,6 +72,7 @@
                     android:id="@+id/fileTypeImageView"
                     android:layout_width="142dp"
                     android:layout_height="113dp"
+                    android:layout_weight="0"
                     app:srcCompat="@android:color/background_light" />
 
                 <Button

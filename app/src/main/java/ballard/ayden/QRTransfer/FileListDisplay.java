@@ -88,6 +88,9 @@ public class FileListDisplay extends AppCompatActivity {
                 else if (filename.contains(".mp4")){ //video file types
                     launchVideoFile(fileToOpen);
                 }
+                else if (filename.contains(".apk")){
+                    launchAPKFile(fileToOpen);
+                }
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -191,6 +194,26 @@ public class FileListDisplay extends AppCompatActivity {
                 objIntent.setDataAndType(path, "image/*");
                 objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(objIntent);//Starting the video viewer
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "Error: This file does not exist.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchAPKFile(File apkFile){
+        String dstPath = (Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS) + "/" + apkFile.getName());
+        File dstFile = new File(dstPath);
+        if(dstFile.exists()){
+            try{
+                Uri path = Uri.fromFile(dstFile);
+                Intent objIntent = new Intent(Intent.ACTION_VIEW);
+                objIntent.setDataAndType(path,"application/vnd.android.package-archive");
+                objIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(objIntent);
             } catch(Exception e){
                 e.printStackTrace();
             }

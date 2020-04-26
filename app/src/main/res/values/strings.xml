@@ -2,8 +2,8 @@
     <string name="app_name">QR File Transfer</string>
     <string name="qr_file_transfer">QR File Transfer</string>
     <string name="download_a_file">Download a file</string>
-    <string name="view_files">View files</string>
-    <string name="select_file">Select File</string>
+    <string name="view_files">View Downloaded files</string>
+    <string name="select_file">Select File For Upload</string>
 
     <string name="delete_dialog_title">Would you like to delete this file?</string>
     <string-array name="yes_no_array">

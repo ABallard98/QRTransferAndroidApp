@@ -184,6 +184,8 @@ public class DownloadFileActivity extends AppCompatActivity {
                         fileTypeImageView.setImageResource(R.drawable.ic_pdf);
                     } else if(fileName.contains(".mp4")){
                         fileTypeImageView.setImageResource(R.drawable.ic_music_video_black);
+                    } else if(fileName.contains(".apk")){
+                        fileTypeImageView.setImageResource(R.drawable.ic_apk_file);
                     }
                     else if(fileName.contains(".png") || fileName.contains(".jpg")){
                         fileTypeImageView.setImageResource(R.drawable.image_icon);
