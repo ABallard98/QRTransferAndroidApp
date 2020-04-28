@@ -49,9 +49,7 @@ public class MainActivity extends AppCompatActivity {
         serverStatusTextView.setText("Server status: Offline");
         serverStatusTextView.setTextColor(Color.RED);
 
-        //checking for server status
-        checkServerStatus();
-
+        checkServerStatus(); //checking for server status
 
     } //end of onCreate
 
@@ -86,16 +84,16 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(() -> {
             try{
                 Socket testSocket = new Socket("86.157.154.4", 8007);
-                if(testSocket.isConnected()) {
+                if(testSocket.isConnected()) { //if socket successfully connects
+                    //update server status text view
                     serverStatusTextView.setText("Server status: Online");
                     serverStatusTextView.setTextColor(Color.GREEN);
                 }
-                testSocket.close();
+                testSocket.close(); //close socket
             } catch (Exception e){
                 e.printStackTrace();
-
             }
-        });
+        }); //end of thread
         thread.start();
     }
 

@@ -1,12 +1,16 @@
 package ballard.ayden.QRTransfer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Environment;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * This class is used to manage the files downloaded using the application.
@@ -109,8 +113,40 @@ public class FileManager {
         }
     }
 
+    /**
+     * Method to convert byte size of file into a more readable format
+     * @param file - file to get size of
+     * @return String - file size in a readable format
+     */
+    public static String getFileSizeToString(File file){
+        int fileSizeBytes = (int) file.length();
+        if(fileSizeBytes > 1000000){ //if file size is larger than 1mb
+            long fileSizeMb = Math.round(fileSizeBytes / Math.pow(1024,2));
+            String toReturn = fileSizeMb + "mb";
+            return toReturn;
+        } else if(fileSizeBytes > 1000){ //if file size is larger than 1kb
+            long fileSizeKb = fileSizeBytes / 1000;
+            String toReturn = fileSizeKb + "kb";
+            return toReturn;
+        }
+        else { //else return as bytes
+            String toReturn = fileSizeBytes + " bytes";
+            return toReturn;
+        }
+    }
 
-
-
-
+    /**
+     * Method to get the date created of a specified file
+     * @param file - file to collect the date created
+     * @return String - date and time of file created
+     */
+    public static String getFileDateCreated(File file){
+        try {
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(),BasicFileAttributes.class);
+            return attr.creationTime()+"";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

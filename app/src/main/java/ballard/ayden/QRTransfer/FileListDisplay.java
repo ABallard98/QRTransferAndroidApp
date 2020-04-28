@@ -11,8 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -42,6 +49,8 @@ public class FileListDisplay extends AppCompatActivity {
     private SortOrder sortOrder; //sort order enum
     private Menu sortMenu; //sort menu dropdown
 
+    private FrameLayout selectedFileFrame;
+
     /**
      * Method to initializer FileListDisplay
      * @param savedInstanceState
@@ -53,6 +62,8 @@ public class FileListDisplay extends AppCompatActivity {
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
+
+        this.selectedFileFrame = findViewById(R.id.selectedFileFrame);
 
         //ArrayLists for file names and sizes
         fileNames = new ArrayList();
@@ -72,71 +83,8 @@ public class FileListDisplay extends AppCompatActivity {
         this.listView = findViewById(R.id.fileListView);
         listView.setAdapter(fileListAdapter);
 
-        //on click listener to open downloaded files
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            try{
-                String filename = fileNames.get(position);
-                File fileToOpen = FileManager.findFile(filename);
-                if(filename.contains(".pdf")){ //If the file is a PDF
-                   launchPdfFile(fileToOpen);
-                }
-                //image MIME types
-                else if (filename.contains(".png") || filename.contains(".jpg") ||
-                        filename.contains(".jpeg")) { //If the file is an image
-                    launchImageFile(fileToOpen);
-                }
-                else if (filename.contains(".mp4")){ //video file types
-                    launchVideoFile(fileToOpen);
-                }
-                else if (filename.contains(".apk")){
-                    launchAPKFile(fileToOpen);
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        });
-
-        //on long click listener to delete a downloaded file
-        listView.setOnItemLongClickListener((arg0, arg1, pos, id) -> {
-            try{
-                final int filePos = pos; //must be final for internal method
-                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                    switch(which){
-                        case(DialogInterface.BUTTON_POSITIVE): //if user selects yes
-
-                            //Delete file from internal and external storage
-                            FileManager.deleteFileInternalExternal(fileNames.get(filePos));
-                            //remove from names and size array lists
-                            fileNames.remove(filePos);
-                            fileSizes.remove(filePos);
-
-                            //re-initialize the array of downloaded files
-                            fileListAdapter.notifyDataSetChanged();
-
-                            //alert user file was deleted
-                            Toast.makeText(getApplicationContext(),
-                                    "File Deleted ", Toast.LENGTH_LONG)
-                                    .show();
-                            break;
-                        case(DialogInterface.BUTTON_NEGATIVE):
-                            break;
-                    }
-                };
-
-                //Building dialog popup for file deletion confirmation
-                AlertDialog.Builder builder1 =
-                        new AlertDialog.Builder(FileListDisplay.this);
-                builder1.setTitle(R.string.delete_dialog_title);
-                builder1.setPositiveButton("Yes", dialogClickListener);
-                builder1.setNegativeButton("No", dialogClickListener);
-                builder1.show(); //show popup dialog confirmation
-
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-            return true;
-        });
-
+        //todo here
+        initializeFileListListeners(listView);
     }
 
     /**
@@ -331,5 +279,128 @@ public class FileListDisplay extends AppCompatActivity {
             fileTypeSortItem.setChecked(false);
             fileSizeSortItem.setChecked(true);
         }
+    }
+
+    private void loadSelectedFileFrame(File file, int pos){
+
+        ImageView selectedFileImage = findViewById(R.id.selectedFileImage);
+        ImageView selectedFileBackButton = findViewById(R.id.selectedFileBackButton);
+        ImageView selectedFileDeleteIcon = findViewById(R.id.selectedFileDeleteIcon);
+
+        TextView selectedFileName = findViewById(R.id.selectedFileName);
+        TextView selectedFileSize = findViewById(R.id.selectedFileSize);
+        TextView selectedFileDateCreated = findViewById(R.id.selectedFileDateCreated);
+        TextView selectedFileDelete = findViewById(R.id.selectedFileDelete);
+
+        this.runOnUiThread(new Thread(() -> {
+            //set text fields
+            selectedFileName.setText("Name: " + file.getName());
+            selectedFileSize.setText("Size: " + FileManager.getFileSizeToString(file));
+            selectedFileDateCreated.setText("Date: " + FileManager.getFileDateCreated(file).split("T")[0]);
+            selectedFileDelete.setText("Delete File");
+
+            //set thumbnail of file
+            new ThumbnailCreatorTask(selectedFileImage, file).execute(file);
+            //make fileFrame visible
+            selectedFileFrame.setVisibility(View.VISIBLE);
+            //disable listView listeners while fileFrame is open
+            listView.setOnItemClickListener(null);
+            listView.setOnItemLongClickListener(null);
+        }));
+
+        //onClickListener for delete button
+        selectedFileDelete.setOnClickListener(view -> {
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch(which){
+                    case(DialogInterface.BUTTON_POSITIVE): //if user selects yes
+
+                        //Delete file from internal and external storage
+                        FileManager.deleteFileInternalExternal(fileNames.get(pos));
+                        //remove from names and size array lists
+                        fileNames.remove(pos);
+                        fileSizes.remove(pos);
+
+                        //re-initialize the array of downloaded files
+                        fileListAdapter.notifyDataSetChanged();
+
+                        //alert user file was deleted
+                        Toast.makeText(getApplicationContext(),
+                                "File Deleted ", Toast.LENGTH_LONG)
+                                .show();
+                        break;
+                    case(DialogInterface.BUTTON_NEGATIVE):
+                        break;
+                }
+            };
+
+            //Building dialog popup for file deletion confirmation
+            AlertDialog.Builder builder1 =
+                    new AlertDialog.Builder(FileListDisplay.this);
+            builder1.setTitle(R.string.delete_dialog_title);
+            builder1.setPositiveButton("Yes", dialogClickListener);
+            builder1.setNegativeButton("No", dialogClickListener);
+            builder1.show(); //show popup dialog confirmation
+
+            //return user to list view
+            runOnUiThread(new Thread(() -> {
+                initializeFileListListeners(listView);
+                selectedFileFrame.setVisibility(View.INVISIBLE);
+
+            }));
+        });
+
+        //back button to take the user back to the ListView
+        selectedFileBackButton.setOnClickListener(view -> {
+            //return user to list view
+            runOnUiThread(new Thread(() -> {
+                initializeFileListListeners(listView);
+                selectedFileFrame.setVisibility(View.INVISIBLE);
+            }));
+        });
+
+
+    }//end of load selected file frame
+
+    /**
+     * Method to initialize the onItemClick and onItemLongClick listeners to the list view
+     * @param listView - list view to set listeners on
+     */
+    private void initializeFileListListeners(ListView listView){
+        //on click listener to open downloaded files
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            try{
+                String filename = fileNames.get(position);
+                File fileToOpen = FileManager.findFile(filename);
+                if(filename.contains(".pdf")){ //If the file is a PDF
+                    launchPdfFile(fileToOpen);
+                }
+                //image MIME types
+                else if (filename.contains(".png") || filename.contains(".jpg") ||
+                        filename.contains(".jpeg")) { //If the file is an image
+                    launchImageFile(fileToOpen);
+                }
+                else if (filename.contains(".mp4")){ //video file types
+                    launchVideoFile(fileToOpen);
+                }
+                else if (filename.contains(".apk")){
+                    launchAPKFile(fileToOpen);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        //on long click listener to view more details of the file
+        listView.setOnItemLongClickListener((arg0, arg1, pos, id) -> {
+            try{
+                final int filePos = pos; //must be final for internal method
+                String filename = fileNames.get(pos);
+                File file = FileManager.findFile(filename);
+                loadSelectedFileFrame(file, pos);
+
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+            return true;
+        });
     }
 }

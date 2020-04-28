@@ -59,6 +59,8 @@ public class DownloadFileActivity extends AppCompatActivity {
         cameraFrame = findViewById(R.id.cameraFrame);
         downloadProgressTextView = findViewById(R.id.downloadProgressTextView);
 
+
+
         //Initialise action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -125,12 +127,9 @@ public class DownloadFileActivity extends AppCompatActivity {
         } else{
 
             //make progress bar visible
-            this.runOnUiThread(new Thread(new Runnable(){
-                @Override
-                public void run() {
-                    downloadProgressTextView.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
-                }
+            this.runOnUiThread(new Thread(() -> {
+                downloadProgressTextView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
             }));
 
             try{
