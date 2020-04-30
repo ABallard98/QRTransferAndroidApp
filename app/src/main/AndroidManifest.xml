@@ -27,6 +27,17 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="ballard.ayden.QRTransfer"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
+
         <activity android:name=".DownloadFileActivity"></activity>
         <activity android:name="ballard.ayden.QRTransfer.FileListDisplay"></activity>
         <activity android:name="ballard.ayden.QRTransfer.ImageViewActivity"></activity>

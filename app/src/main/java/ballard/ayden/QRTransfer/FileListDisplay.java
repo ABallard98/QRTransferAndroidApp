@@ -1,17 +1,20 @@
 package ballard.ayden.QRTransfer;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -85,6 +88,8 @@ public class FileListDisplay extends AppCompatActivity {
 
         //todo here
         initializeFileListListeners(listView);
+
+        System.out.println("path = " + getFilesDir());
     }
 
     /**
@@ -286,11 +291,13 @@ public class FileListDisplay extends AppCompatActivity {
         ImageView selectedFileImage = findViewById(R.id.selectedFileImage);
         ImageView selectedFileBackButton = findViewById(R.id.selectedFileBackButton);
         ImageView selectedFileDeleteIcon = findViewById(R.id.selectedFileDeleteIcon);
+        ImageView selectedFileShareIcon = findViewById(R.id.selectedFileShareIcon);
 
         TextView selectedFileName = findViewById(R.id.selectedFileName);
         TextView selectedFileSize = findViewById(R.id.selectedFileSize);
         TextView selectedFileDateCreated = findViewById(R.id.selectedFileDateCreated);
         TextView selectedFileDelete = findViewById(R.id.selectedFileDelete);
+        TextView selectedFileShare = findViewById(R.id.selectedFileShare);
 
         this.runOnUiThread(new Thread(() -> {
             //set text fields
@@ -358,8 +365,30 @@ public class FileListDisplay extends AppCompatActivity {
             }));
         });
 
+        //onClickListener for file share
+        selectedFileShare.setOnClickListener(view -> shareFile(file));
+        selectedFileShareIcon.setOnClickListener(view -> shareFile(file));
+
 
     }//end of load selected file frame
+
+    private void shareFile(File file){
+        Intent shareFileIntent = new Intent(Intent.ACTION_SEND);
+        if(file.exists()){
+            //get file type
+            //String extension = MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath());
+            //String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+            Uri fileUri = FileProvider.getUriForFile(this, "ballard.ayden.QRTransfer", file);
+            //set intent properties
+            shareFileIntent.setType("*/*");
+            shareFileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            shareFileIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareFileIntent.putExtra(Intent.EXTRA_SUBJECT, "Sharing file...");
+            shareFileIntent.putExtra(Intent.EXTRA_TEXT, "Sharing file");
+
+            startActivity(Intent.createChooser(shareFileIntent, "Share File"));
+        }
+    }
 
     /**
      * Method to initialize the onItemClick and onItemLongClick listeners to the list view
