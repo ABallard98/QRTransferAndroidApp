@@ -164,7 +164,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
                     fwtList.add(fwt);
                 }
                 else if (fileNames.get(position).contains(".mp4")) { //if video file
-                    new ThumbnailCreatorTask(imageView, file).execute(file);
+                    new ThumbnailCreatorTask(imageView, file, context).execute(file);
                 }
                 else if (fileNames.get(position).contains(".apk")) { //if apk file
                     PackageManager pm = context.getPackageManager();
@@ -172,7 +172,7 @@ public class FileListAdapter extends ArrayAdapter<String> {
                     imageView.setImageDrawable(pi.applicationInfo.loadIcon(pm));
                 }
                 else {
-                    new ThumbnailCreatorTask(imageView, file).execute(file);
+                    new ThumbnailCreatorTask(imageView, file,context).execute(file);
                 }
             }
         }
@@ -201,6 +201,11 @@ public class FileListAdapter extends ArrayAdapter<String> {
         }
     }
 
+    /**
+     * Method to get FileWithThumbnail object from the FileWithThumbnail ArrayList
+     * @param file - file to be found
+     * @return FileWithThumbnail - f
+     */
     private FileWithThumbnail getFwt(File file){
         for(FileWithThumbnail f : fwtList){
             if(f.getFile().getAbsolutePath().equals(file.getAbsolutePath())){

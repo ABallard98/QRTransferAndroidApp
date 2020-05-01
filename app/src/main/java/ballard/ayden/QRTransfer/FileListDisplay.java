@@ -156,6 +156,11 @@ public class FileListDisplay extends AppCompatActivity {
         }
     }
 
+    //todo needs to be fixed
+    /**
+     * Method to launch an APK File
+     * @param apkFile - APK file to be launched
+     */
     private void launchAPKFile(File apkFile){
         String dstPath = (Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS) + "/" + apkFile.getName());
@@ -182,13 +187,9 @@ public class FileListDisplay extends AppCompatActivity {
     private void initializeFileArrays(){
         File downloadedFilesFolder = new File(MainActivity.DB_PATH);
         File[] files = downloadedFilesFolder.listFiles();
-        System.out.println("*** " + files.length + " ***");
         if(files != null){
-            System.out.println("*** " + files.length + " ***");
             for(File f : files){
-                if(f != null){
-                    System.out.println("***\n FILE FOUND - " + f.getAbsolutePath()+"\nSIZE - " +
-                            f.length() + " BYTES \n***");
+                if(f != null && !(f.getName().contains(".list"))){
                     fileNames.add(f.getName());
                     fileSizes.add(f.length()+"");
                     this.files.add(f);
@@ -246,8 +247,6 @@ public class FileListDisplay extends AppCompatActivity {
                 fileListAdapter.notifyDataSetChanged();
                 sortOrder = SortOrder.FILE_SIZE;
                 break;
-//                MenuItem fileSizeSortItem = sortMenu.findItem(R.id.menuSortFileSize);
-//                fileSizeSortItem.setChecked(true);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -307,7 +306,7 @@ public class FileListDisplay extends AppCompatActivity {
             selectedFileDelete.setText("Delete File");
 
             //set thumbnail of file
-            new ThumbnailCreatorTask(selectedFileImage, file).execute(file);
+            new ThumbnailCreatorTask(selectedFileImage, file, this).execute(file);
             //make fileFrame visible
             selectedFileFrame.setVisibility(View.VISIBLE);
             //disable listView listeners while fileFrame is open
@@ -315,46 +314,9 @@ public class FileListDisplay extends AppCompatActivity {
             listView.setOnItemLongClickListener(null);
         }));
 
-        //onClickListener for delete button
-        selectedFileDelete.setOnClickListener(view -> {
-            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch(which){
-                    case(DialogInterface.BUTTON_POSITIVE): //if user selects yes
-
-                        //Delete file from internal and external storage
-                        FileManager.deleteFileInternalExternal(fileNames.get(pos));
-                        //remove from names and size array lists
-                        fileNames.remove(pos);
-                        fileSizes.remove(pos);
-
-                        //re-initialize the array of downloaded files
-                        fileListAdapter.notifyDataSetChanged();
-
-                        //alert user file was deleted
-                        Toast.makeText(getApplicationContext(),
-                                "File Deleted ", Toast.LENGTH_LONG)
-                                .show();
-                        break;
-                    case(DialogInterface.BUTTON_NEGATIVE):
-                        break;
-                }
-            };
-
-            //Building dialog popup for file deletion confirmation
-            AlertDialog.Builder builder1 =
-                    new AlertDialog.Builder(FileListDisplay.this);
-            builder1.setTitle(R.string.delete_dialog_title);
-            builder1.setPositiveButton("Yes", dialogClickListener);
-            builder1.setNegativeButton("No", dialogClickListener);
-            builder1.show(); //show popup dialog confirmation
-
-            //return user to list view
-            runOnUiThread(new Thread(() -> {
-                initializeFileListListeners(listView);
-                selectedFileFrame.setVisibility(View.INVISIBLE);
-
-            }));
-        });
+        //onClickListener for delete text
+        selectedFileDelete.setOnClickListener(view -> deleteFile(pos));
+        selectedFileDeleteIcon.setOnClickListener(view ->deleteFile(pos));
 
         //back button to take the user back to the ListView
         selectedFileBackButton.setOnClickListener(view -> {
@@ -369,15 +331,16 @@ public class FileListDisplay extends AppCompatActivity {
         selectedFileShare.setOnClickListener(view -> shareFile(file));
         selectedFileShareIcon.setOnClickListener(view -> shareFile(file));
 
-
     }//end of load selected file frame
 
+    /**
+     * Method to create a share file intent of selected file
+     * @param file - file to be shared
+     */
     private void shareFile(File file){
         Intent shareFileIntent = new Intent(Intent.ACTION_SEND);
         if(file.exists()){
-            //get file type
-            //String extension = MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath());
-            //String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+            //get Uri of file to be shared
             Uri fileUri = FileProvider.getUriForFile(this, "ballard.ayden.QRTransfer", file);
             //set intent properties
             shareFileIntent.setType("*/*");
@@ -385,7 +348,7 @@ public class FileListDisplay extends AppCompatActivity {
             shareFileIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
             shareFileIntent.putExtra(Intent.EXTRA_SUBJECT, "Sharing file...");
             shareFileIntent.putExtra(Intent.EXTRA_TEXT, "Sharing file");
-
+            //launch intent
             startActivity(Intent.createChooser(shareFileIntent, "Share File"));
         }
     }
@@ -431,5 +394,49 @@ public class FileListDisplay extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    private boolean deleteFile(int pos){
+        try{
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch(which){
+                    case(DialogInterface.BUTTON_POSITIVE): //if user selects yes
+                        //Delete file from internal and external storage
+                        FileManager.deleteFileInternalExternal(fileNames.get(pos));
+                        //remove from names and size array lists
+                        fileNames.remove(pos);
+                        fileSizes.remove(pos);
+
+                        //re-initialize the array of downloaded files
+                        fileListAdapter.notifyDataSetChanged();
+
+                        //alert user file was deleted
+                        Toast.makeText(getApplicationContext(),
+                                "File Deleted ", Toast.LENGTH_LONG)
+                                .show();
+                        break;
+                    case(DialogInterface.BUTTON_NEGATIVE):
+                        break;
+                }
+            };
+
+            //Building dialog popup for file deletion confirmation
+            AlertDialog.Builder builder1 =
+                    new AlertDialog.Builder(FileListDisplay.this);
+            builder1.setTitle(R.string.delete_dialog_title);
+            builder1.setPositiveButton("Yes", dialogClickListener);
+            builder1.setNegativeButton("No", dialogClickListener);
+            builder1.show(); //show popup dialog confirmation
+
+            //return user to list view
+            runOnUiThread(new Thread(() -> {
+                initializeFileListListeners(listView);
+                selectedFileFrame.setVisibility(View.INVISIBLE);
+
+            }));
+            return true;
+        } catch (Exception e){
+            return false;
+        }
     }
 }

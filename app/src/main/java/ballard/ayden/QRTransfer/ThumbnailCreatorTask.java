@@ -1,6 +1,6 @@
 package ballard.ayden.QRTransfer;
 
-import android.content.pm.PackageManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
@@ -21,15 +21,18 @@ public class ThumbnailCreatorTask extends AsyncTask<File, Void, Bitmap> {
 
     private File file; //file to be loaded
     private final WeakReference<ImageView> imageView; //Weak Reference to image view
+    private Context context;
 
     /**
      * Constructor
      * @param imageView - reference to image view
      * @param file - file to generate thumbnail of
+     * @param context - application context
      */
-    public ThumbnailCreatorTask(ImageView imageView, File file){
+    public ThumbnailCreatorTask(ImageView imageView, File file, Context context){
         this.file = file;
         this.imageView = new WeakReference(imageView);
+        this.context = context;
     }
 
     /**
@@ -69,7 +72,16 @@ public class ThumbnailCreatorTask extends AsyncTask<File, Void, Bitmap> {
             thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(),
                     MediaStore.Images.Thumbnails.MINI_KIND);
             return thumbnail;
-        } else {
+        } else if(file.getName().contains(".pdf")){
+            Bitmap toReturn = BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.ic_pdf);
+            return toReturn;
+        } else if(file.getName().contains(".apk")){
+            Bitmap toReturn = BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.ic_apk_file);
+            return toReturn;
+        }
+        else {
             thumbnail = BitmapFactory.decodeFile(file.getAbsolutePath());
             return thumbnail;
          }

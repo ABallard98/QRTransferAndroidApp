@@ -198,8 +198,9 @@ public class DownloadFileActivity extends AppCompatActivity {
                 }
             }));
         } catch (Exception e){
-            //todo fix toast notification
-            //Toast.makeText(this,"QR code not found.", Toast.LENGTH_LONG).show();
+            this.runOnUiThread(new Thread(() -> {
+                Toast.makeText(this,"QR code not found.",Toast.LENGTH_LONG).show();
+            }));
         }
    }
 
