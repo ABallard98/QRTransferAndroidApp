@@ -86,7 +86,6 @@ public class FileListDisplay extends AppCompatActivity {
         this.listView = findViewById(R.id.fileListView);
         listView.setAdapter(fileListAdapter);
 
-        //todo here
         initializeFileListListeners(listView);
 
         System.out.println("path = " + getFilesDir());

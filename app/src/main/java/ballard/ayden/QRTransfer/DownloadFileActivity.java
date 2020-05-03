@@ -92,7 +92,7 @@ public class DownloadFileActivity extends AppCompatActivity {
         detector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-
+                mCamera.release();
             }
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {

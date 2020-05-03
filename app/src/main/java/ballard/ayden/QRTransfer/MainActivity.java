@@ -1,13 +1,19 @@
 package ballard.ayden.QRTransfer;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.Socket;
 
@@ -20,12 +26,22 @@ import java.net.Socket;
 public class MainActivity extends AppCompatActivity {
 
     public static String DB_PATH; //path for internal files
-
     private Button viewFilesButton; //button to launch view files activity
     private Button downloadFileButton; //button to launch downloaded files activity
     private Button selectFileButton; //button to launch generate QR activity
     private ImageView logoImageView; //image view for logo
     private TextView serverStatusTextView; //text view for server status
+
+    //permission codes
+    private final int CAMERA_PERMISSION = 3001;
+    private final int CONTACT_PERMISSION = 3002;
+    private final int STORAGE_EXTERNAL_PERMISSION = 3003;
+    private final int ALL_PERMISSIONS = 1;
+    private final String[] PERMISSIONS = {
+      Manifest.permission.CAMERA,
+      Manifest.permission.READ_CONTACTS,
+      Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
 
     /**
@@ -45,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
         logoImageView.setImageResource(R.drawable.qrlogo);
         DB_PATH =  getFilesDir().getAbsolutePath(); //assign file directory for app
+
+        //todo check permissions
+        if(!checkPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, ALL_PERMISSIONS);
+        }
 
         serverStatusTextView.setText("Server status: Offline");
         serverStatusTextView.setTextColor(Color.RED);
@@ -80,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(generateQrIntent);
     }
 
+    /**
+     * Method to check server status and update server status text view
+     */
     private void checkServerStatus(){
         Thread thread = new Thread(() -> {
             try{
@@ -97,6 +121,65 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
 
+    /**
+     * Method to check if permissions are granted, if not - ask for permissions
+     * @param context - application context
+     * @param permissions - permissions to be checked if granted
+     * @return boolean - false if any permission is not granted
+     */
+    private boolean checkPermissions(Context context, String[] permissions){
+        if(context != null && permissions != null){
+            for(String permission : permissions){
+                if(ActivityCompat.checkSelfPermission(context, permission)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**+
+     * Method to handle on request permission results
+     * @param requestCode - request code of permission
+     * @param permissions - permissions asked to be granted
+     * @param grantResults - permission granted results
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        switch(requestCode) {
+            case(CAMERA_PERMISSION):
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this,"Camera Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                } else {
+                    Toast.makeText(this,"Camera Permission Denied - expect errors",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            case(STORAGE_EXTERNAL_PERMISSION):
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this,"Storage Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                } else {
+                    Toast.makeText(this,"Storage Permission Denied - expect errors",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            case(CONTACT_PERMISSION):
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this,"Contact Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                } else {
+                    Toast.makeText(this,"Contact Permission Denied - expect errors",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+        }
+    }
 
 
 }//end of class

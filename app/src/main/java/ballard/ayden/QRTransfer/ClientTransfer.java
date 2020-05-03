@@ -39,7 +39,6 @@ public class ClientTransfer {
 
             filename = filename.replace(" ",""); //remove whitespaces in filename
 
-            //todo original file output stream
             FileOutputStream fos = context.openFileOutput(filename,Context.MODE_PRIVATE);
 
             //FileOutputStream fos = new FileOutputStream(MainActivity.EXTERNAL_FILES_PATH);
