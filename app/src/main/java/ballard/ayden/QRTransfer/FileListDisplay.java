@@ -1,8 +1,10 @@
 package ballard.ayden.QRTransfer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,10 +40,14 @@ public class FileListDisplay extends AppCompatActivity {
 
 
     private enum SortOrder { //enum for current sort order
-        ALPHABETICAL,
-        DATE,
-        FILE_TYPE,
-        FILE_SIZE
+        ALPHABETICAL, DATE, FILE_TYPE, FILE_SIZE;
+        public static SortOrder toSortOrder(String sortOrderString){
+            try{
+                return valueOf(sortOrderString);
+            } catch (Exception e){
+                return ALPHABETICAL;
+            }
+        }
     }
 
     private ArrayList<String> fileNames; //ArrayList of the file names
@@ -85,10 +91,15 @@ public class FileListDisplay extends AppCompatActivity {
                 new FileListAdapter(this, R.layout.file_display,fileNames, files);
         this.listView = findViewById(R.id.fileListView);
         listView.setAdapter(fileListAdapter);
-
         initializeFileListListeners(listView);
 
-        System.out.println("path = " + getFilesDir());
+        //Initialising saved file sort order
+        try{
+            sortOrder = getSavedFileSortOrder();
+            forceSortOrderChange();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -206,8 +217,9 @@ public class FileListDisplay extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_sorting_options, menu);
         sortMenu = menu;
-        MenuItem alphabeticalSort = sortMenu.findItem(R.id.menuSortAlphabetically);
-        alphabeticalSort.setChecked(true); //check alphabetical sort by default
+        //initialise defaults for sort menu
+        getSavedFileSortOrder();
+        updateSortOrderCheckBox();
         return true;
     }
 
@@ -250,7 +262,34 @@ public class FileListDisplay extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         updateSortOrderCheckBox(); //update checkboxes of sort order dropdown
+        setSavedFileSortOrder(sortOrder); //update the shared preference
         return true;
+    }
+
+    //todo merge the method below and above together - repeated code
+
+    /**
+     * Method to change the file sort order without user interaction from the drop down menu
+     */
+    private void forceSortOrderChange(){
+        if(sortOrder == SortOrder.ALPHABETICAL){
+            fileListAdapter.sortAlphabetically(); //sort files by alphabetical order
+            fileListAdapter.notifyDataSetChanged();
+            sortOrder = SortOrder.ALPHABETICAL; //update sort order
+        } else if (sortOrder == SortOrder.DATE) {
+            fileListAdapter.sortDateCreated(); //sort files by date created
+            fileListAdapter.notifyDataSetChanged();
+            sortOrder = SortOrder.DATE; //update sort order
+        } else if (sortOrder == SortOrder.FILE_TYPE){
+            fileListAdapter.sortFileType();
+            fileListAdapter.notifyDataSetChanged();
+            sortOrder = SortOrder.FILE_TYPE; //update sort order
+        } else if (sortOrder == SortOrder.FILE_SIZE){
+            fileListAdapter.sortFileSize();
+            fileListAdapter.notifyDataSetChanged();
+            sortOrder = SortOrder.FILE_SIZE;
+        }
+        updateSortOrderCheckBox(); //update checkboxes of sort order dropdown
     }
 
     /**
@@ -282,8 +321,14 @@ public class FileListDisplay extends AppCompatActivity {
             fileTypeSortItem.setChecked(false);
             fileSizeSortItem.setChecked(true);
         }
+
     }
 
+    /**
+     * Method to initialise pop up window for long click on a file
+     * @param file - file to be loaded
+     * @param pos - position of file in ListView
+     */
     private void loadSelectedFileFrame(File file, int pos){
 
         ImageView selectedFileImage = findViewById(R.id.selectedFileImage);
@@ -373,7 +418,7 @@ public class FileListDisplay extends AppCompatActivity {
                 else if (filename.contains(".mp4")){ //video file types
                     launchVideoFile(fileToOpen);
                 }
-                else if (filename.contains(".apk")){
+                else if (filename.contains(".apk")){ //application installer types
                     launchAPKFile(fileToOpen);
                 }
             } catch (Exception e){
@@ -395,6 +440,37 @@ public class FileListDisplay extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to set the file sort order to shared preferences
+     * @param sortOrder - sort order to be saved
+     */
+    private void setSavedFileSortOrder(SortOrder sortOrder){
+        try{
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("SavedSortOrder", sortOrder.toString());
+            editor.commit();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Method to collect the saved file sort order
+     * @return saved file sort order - default is alphabetical
+     */
+    private SortOrder getSavedFileSortOrder(){
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        String enumString = sharedPref.getString("SavedSortOrder",
+                SortOrder.ALPHABETICAL.toString());
+        return SortOrder.toSortOrder(enumString);
+    }
+
+    /**
+     * Method to delete file
+     * @param pos - position of file in ListView
+     * @return true if successful deletion of file, else false
+     */
     private boolean deleteFile(int pos){
         try{
             DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
@@ -418,7 +494,6 @@ public class FileListDisplay extends AppCompatActivity {
                         break;
                 }
             };
-
             //Building dialog popup for file deletion confirmation
             AlertDialog.Builder builder1 =
                     new AlertDialog.Builder(FileListDisplay.this);

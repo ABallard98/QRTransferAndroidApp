@@ -12,6 +12,8 @@
     <string name="share_file">Share File</string>
     <string name="delete_file">Delete File</string>
 
+    <string name="sort_order">Sort Order</string>
+
     <string name="delete_dialog_title">Would you like to delete this file?</string>
     <string-array name="yes_no_array">
         <item>Yes</item>
