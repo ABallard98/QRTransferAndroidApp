@@ -8,7 +8,9 @@ import java.util.Scanner;
  */
 public class FoundTextReader {
 
-    //QR Code Format = <IP Address>-<Port>-<File name>-<File size>
+    /*
+     *   QR Code Format = <IP Address>-<Port>-<dateTime>-<File name>-<File size>
+     */
 
     /**
      * Method to return the port number embedded in the QR code.
@@ -47,6 +49,7 @@ public class FoundTextReader {
         in.useDelimiter("-");
         in.next();//skip ip address
         in.next();//skip port
+        in.next();//skip dateTime
         String filename = in.next();
         in.close();
         return filename;
@@ -62,28 +65,29 @@ public class FoundTextReader {
         in.useDelimiter("-");
         in.next();//skip ip address
         in.next();//skip port
+        in.next();//skip date time
         in.next();//skip filename
-
         int fileSizeBytes = in.nextInt();
         in.close();
         return Integer.valueOf(fileSizeBytes);
     }
 
     /**
-     * Method to return the file size in mb as a string
+     * Method to return the dateTime of when the QR code was created
      * @param foundText - embedded QR code
-     * @return size file in mb as a String
+     * @return long - dateTime of when QR code was created
      */
-    public static String readFileSizeString(String foundText){
-        int fileSizeBytes = readFileSizeBytes(foundText);
-        if(fileSizeBytes > 1000000){
-            long fileSizeMb = Math.round(fileSizeBytes / Math.pow(1024,2));
-            String toReturn = fileSizeMb + "mb";
-            return toReturn;
-        } else {
-            String toReturn = fileSizeBytes + " bytes";
-            return toReturn;
-        }
+    public static long readDateTime(String foundText){
+        Scanner in = new Scanner(foundText);
+        in.useDelimiter("-");
+        in.next();//skip ip address
+        in.next();//skip port
+        long dateTime = in.nextLong();
+        in.close();
+        return dateTime;
     }
+
+
+
 
 }
