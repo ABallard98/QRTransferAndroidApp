@@ -72,6 +72,18 @@ public class FoundTextReader {
         return Integer.valueOf(fileSizeBytes);
     }
 
+    public static String readFileSizeStringBytes(String foundText){
+        Scanner in = new Scanner(foundText);
+        in.useDelimiter("-");
+        in.next();//skip ip address
+        in.next();//skip port
+        in.next();//skip date time
+        in.next();//skip filename
+        String toReturn = in.next();
+        in.close();
+        return toReturn;
+    }
+
     /**
      * Method to return the dateTime of when the QR code was created
      * @param foundText - embedded QR code

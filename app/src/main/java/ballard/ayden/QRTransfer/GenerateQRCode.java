@@ -18,7 +18,8 @@ public class GenerateQRCode {
     public synchronized static String generateQRCodeText(File file) {
         String filename = file.getName().replace("-","");
         long fileSizeBytes = file.length();
-        String qrCodeText = "80.2.250.205-8007-"+filename+"-"+fileSizeBytes;
+        long dateTime = System.currentTimeMillis();
+        String qrCodeText = "80.2.250.205-8007-"+dateTime+"-"+filename+"-"+fileSizeBytes;
 
         return qrCodeText;
     }

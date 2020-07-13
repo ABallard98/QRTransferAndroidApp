@@ -161,7 +161,7 @@ public class DownloadFileActivity extends AppCompatActivity {
      */
     private void setDownloadButton(String foundText){
         try {
-            //make background different colour
+            //make camera frame invisible and set pic taken to visible
             this.runOnUiThread(new Thread(new Runnable(){
                 @Override
                 public void run() {
@@ -172,7 +172,7 @@ public class DownloadFileActivity extends AppCompatActivity {
 
             //grab file name and size
             String fileName = FoundTextReader.readFileName(foundText);
-            String fileSize = FoundTextReader.readFileSizeString(foundText);
+            String fileSize = FoundTextReader.readFileSizeStringBytes(foundText);
 
             //set file type image view and download button visibility to true
             this.runOnUiThread(new Thread(new Runnable (){

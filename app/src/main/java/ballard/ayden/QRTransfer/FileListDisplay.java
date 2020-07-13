@@ -1,6 +1,5 @@
 package ballard.ayden.QRTransfer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,18 +11,16 @@ import android.os.StrictMode;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,9 +35,15 @@ import java.util.ArrayList;
 
 public class FileListDisplay extends AppCompatActivity {
 
-
-    private enum SortOrder { //enum for current sort order
+    //enum for current sort order
+    private enum SortOrder {
         ALPHABETICAL, DATE, FILE_TYPE, FILE_SIZE;
+
+        /**
+         * Method to return the SortOrder matching the String parsed
+         * @param sortOrderString - Sort order as string
+         * @return SortOrder
+         */
         public static SortOrder toSortOrder(String sortOrderString){
             try{
                 return valueOf(sortOrderString);
@@ -58,7 +61,8 @@ public class FileListDisplay extends AppCompatActivity {
     private SortOrder sortOrder; //sort order enum
     private Menu sortMenu; //sort menu dropdown
 
-    private FrameLayout selectedFileFrame;
+
+    private FrameLayout selectedFileFrame; //frame of selected file
 
     /**
      * Method to initializer FileListDisplay
@@ -215,11 +219,33 @@ public class FileListDisplay extends AppCompatActivity {
      */
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
+
+        //sort menu properties
         inflater.inflate(R.menu.file_sorting_options, menu);
         sortMenu = menu;
+
         //initialise defaults for sort menu
         getSavedFileSortOrder();
         updateSortOrderCheckBox();
+
+        //search bar properties
+        MenuItem searchIcon = menu.findItem(R.id.app_bar_search);
+        SearchView searchView = (SearchView) searchIcon.getActionView();
+        searchView.setQueryHint("Search file name here!");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                fileListAdapter.getFilter().filter(s);
+                return true;
+            }
+        });
+
         return true;
     }
 
@@ -258,6 +284,8 @@ public class FileListDisplay extends AppCompatActivity {
                 fileListAdapter.notifyDataSetChanged();
                 sortOrder = SortOrder.FILE_SIZE;
                 break;
+            case(R.id.app_bar_search):
+
             default:
                 return super.onOptionsItemSelected(item);
         }
