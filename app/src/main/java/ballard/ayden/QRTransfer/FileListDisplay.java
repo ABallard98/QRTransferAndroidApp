@@ -5,22 +5,26 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.SearchView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,8 +64,6 @@ public class FileListDisplay extends AppCompatActivity {
     private ListView listView; //ListView to contain files downloaded
     private SortOrder sortOrder; //sort order enum
     private Menu sortMenu; //sort menu dropdown
-
-
     private FrameLayout selectedFileFrame; //frame of selected file
 
     /**

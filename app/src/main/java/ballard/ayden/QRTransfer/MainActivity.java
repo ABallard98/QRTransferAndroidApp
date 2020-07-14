@@ -9,6 +9,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private Button selectFileButton; //button to launch generate QR activity
     private ImageView logoImageView; //image view for logo
     private TextView serverStatusTextView; //text view for server status
+
+    private Menu menu;
 
     //permission codes
     private final int CAMERA_PERMISSION = 3001;
@@ -62,17 +68,31 @@ public class MainActivity extends AppCompatActivity {
         logoImageView.setImageResource(R.drawable.qrlogo);
         DB_PATH =  getFilesDir().getAbsolutePath(); //assign file directory for app
 
+        //action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         //todo check permissions
         if(!checkPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, ALL_PERMISSIONS);
         }
 
-        serverStatusTextView.setText("Server status: Offline");
+        serverStatusTextView.setText(R.string.server_connection_fail);
         serverStatusTextView.setTextColor(Color.RED);
 
         checkServerStatus(); //checking for server status
 
     } //end of onCreate
+
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+
+        //sort menu properties
+        inflater.inflate(R.menu.home_menu, menu);
+        this.menu = menu;
+
+
+        return true;
+    }
 
     /**
      * Method to launch the DownloadFile activity
@@ -110,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 Socket testSocket = new Socket("86.157.154.4", 8007);
                 if(testSocket.isConnected()) { //if socket successfully connects
                     //update server status text view
-                    serverStatusTextView.setText("Server status: Online");
+                    serverStatusTextView.setText(R.string.server_connection_successful);
                     serverStatusTextView.setTextColor(Color.GREEN);
                 }
                 testSocket.close(); //close socket

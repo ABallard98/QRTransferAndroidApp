@@ -26,10 +26,13 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/linearLayout5"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="350dp"
         android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
@@ -59,16 +62,17 @@
             android:layout_height="73dp"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/serverStatusTextView"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="122dp"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/serverStatusTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sever Status: Offline"
-            android:textAlignment="center"
-            android:textAllCaps="true"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
