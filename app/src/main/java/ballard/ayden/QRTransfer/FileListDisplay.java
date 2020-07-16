@@ -235,6 +235,7 @@ public class FileListDisplay extends AppCompatActivity {
         SearchView searchView = (SearchView) searchIcon.getActionView();
         searchView.setQueryHint("Search file name here!");
 
+        //search bar on text listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -296,12 +297,13 @@ public class FileListDisplay extends AppCompatActivity {
         return true;
     }
 
-    //todo merge the method below and above together - repeated code
+    //todo merge the method below and above together - repeated lines of code
 
     /**
      * Method to change the file sort order without user interaction from the drop down menu
      */
     private void forceSortOrderChange(){
+        //todo change to switch statement
         if(sortOrder == SortOrder.ALPHABETICAL){
             fileListAdapter.sortAlphabetically(); //sort files by alphabetical order
             fileListAdapter.notifyDataSetChanged();
@@ -330,6 +332,8 @@ public class FileListDisplay extends AppCompatActivity {
         MenuItem dateSortItem = sortMenu.findItem(R.id.menuSortDate);
         MenuItem fileTypeSortItem = sortMenu.findItem(R.id.menuSortFileType);
         MenuItem fileSizeSortItem = sortMenu.findItem(R.id.menuSortFileSize);
+
+        //todo change to switch statement
         if(sortOrder == SortOrder.ALPHABETICAL){
             alphabeticalSortItem.setChecked(true);
             dateSortItem.setChecked(false);
@@ -536,10 +540,11 @@ public class FileListDisplay extends AppCompatActivity {
             runOnUiThread(new Thread(() -> {
                 initializeFileListListeners(listView);
                 selectedFileFrame.setVisibility(View.INVISIBLE);
-
             }));
+
             return true;
         } catch (Exception e){
+            e.printStackTrace();
             return false;
         }
     }

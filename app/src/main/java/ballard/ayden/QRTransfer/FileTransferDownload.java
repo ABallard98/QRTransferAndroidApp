@@ -80,7 +80,7 @@ public class FileTransferDownload extends AsyncTask<Void, Integer, Boolean> {
         try {
 
             System.out.println("connecting...");
-            Socket sock = new Socket("86.157.154.4", port);
+            Socket sock = new Socket(address, port);
             System.out.println("connected");
 
             //sending instructions to the server

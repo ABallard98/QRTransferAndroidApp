@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkServerStatus(){
         Thread thread = new Thread(() -> {
             try{
-                Socket testSocket = new Socket("86.157.154.4", 8007);
+                Socket testSocket = new Socket("86.157.154.80", 8007);
                 if(testSocket.isConnected()) { //if socket successfully connects
                     //update server status text view
                     serverStatusTextView.setText(R.string.server_connection_successful);

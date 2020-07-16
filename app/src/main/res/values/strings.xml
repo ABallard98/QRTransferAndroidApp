@@ -5,6 +5,7 @@
     <string name="download_a_file">Download a file</string>
     <string name="view_files">View Downloaded files</string>
     <string name="select_file">Select File For Upload</string>
+    <string name="send_to_desktop_button">Send File to Desktop</string>
 
     <string name="server_connection_successful">Server is online.</string>
     <string name="server_connection_fail">Server is currently under maintenance.
