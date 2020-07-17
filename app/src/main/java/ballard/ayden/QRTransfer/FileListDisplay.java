@@ -66,6 +66,7 @@ public class FileListDisplay extends AppCompatActivity {
     private Menu sortMenu; //sort menu dropdown
     private FrameLayout selectedFileFrame; //frame of selected file
 
+
     /**
      * Method to initializer FileListDisplay
      * @param savedInstanceState
